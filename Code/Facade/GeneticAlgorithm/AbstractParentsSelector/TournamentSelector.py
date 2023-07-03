@@ -13,7 +13,3 @@ class TournamentSelector(AbstractParentsSelector):
                 self._population[individuals[0][1]])
         print(self._selected_parents)
 
-
-x = TournamentSelector(
-    ['1010101', '1110001',  '1110000', '1110101', '1110101'], [100, 2, 1, 3])
-x.make_parents()
