@@ -10,9 +10,10 @@ class AbstractRecombinator(Protocol):
 
     _parents_pairs: list  # Список пар родителей
     _selected_children: list  # Список выбранных потомков
-    _probability: int  # Вероятность рекомбинации
+    _crossing_probability: int  # Вероятность рекомбинации
+    _changing_probability: int # Вероятность изменения гена
 
-    def __init__(self, parents_pairs: list, probability: list):
+    def __init__(self, parents_pairs: list, crossing_probability: int, changing_probability: int):
         '''
         Инициализация экземпляра класса AbstractRecombinator.
 
@@ -21,7 +22,8 @@ class AbstractRecombinator(Protocol):
             probability (list): Вероятность рекомбинации.
         '''
         self._parents_pairs = parents_pairs
-        self._probability = probability
+        self._crossing_probability = crossing_probability
+        self._changing_probability = changing_probability
         self._selected_children = []
 
     @abc.abstractmethod

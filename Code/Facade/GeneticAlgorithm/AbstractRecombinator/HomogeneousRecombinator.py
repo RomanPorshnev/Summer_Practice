@@ -22,19 +22,20 @@ class HomogeneousRecombinator(AbstractRecombinator):
 
         # Проходимся по парам родителей
         for i in range(len_pairs):
-            # Преобразуем родителей в список символов
-            self._parents_pairs[i] = list(
-                self._parents_pairs[i][0]), list(self._parents_pairs[i][1])
-
-            # Проходимся по каждой позиции хромосомы
-            for j in range(len_chromosome):
-                # С вероятностью, определенной _probability, меняем значения генов местами
-                if randint(0, 100) < (self._probability * 100):
-                    self._parents_pairs[i][0][j], self._parents_pairs[i][1][
-                        j] = self._parents_pairs[i][1][j], self._parents_pairs[i][0][j]
+            self._selected_children.append(
+                (self._parents_pairs[i][0].copy(), self._parents_pairs[i][1].copy()))
+            if randint(0, 100) <= (self._changing_probability * 100):
+                # Проходимся по каждой позиции хромосомы
+                for j in range(len_chromosome):
+                    # С вероятностью, определенной _crossing_probability, меняем значения генов местами
+                    if randint(0, 100) <= (self._crossing_probability * 100):
+                        self._selected_children[i][0][j], self._selected_children[i][1][
+                            j] = self._parents_pairs[i][1][j], self._parents_pairs[i][0][j]
 
             # Преобразуем детей обратно в строку и добавляем их в список потомков
-            self._selected_children.append(''.join(self._parents_pairs[i][0]))
-            self._selected_children.append(''.join(self._parents_pairs[i][1]))
+            self._selected_children[i] = (
+                self._selected_children[i][0], self._parents_pairs[i][0], self._parents_pairs[i][0])
+            self._selected_children[i] = (
+                self._selected_children[i][1], self._parents_pairs[i][1], self._parents_pairs[i][0])
 
         return self._selected_children  # Возвращаем список выбранных потомков
