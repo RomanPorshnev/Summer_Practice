@@ -12,7 +12,7 @@ class HomogeneousRecombinator(AbstractRecombinator):
         Метод make_children() создает потомков с использованием однородной рекомбинации.
 
         Returns:
-            list: Список потомков.
+            list: Список потомков + родители.
         '''
 
         # Получаем количество пар родителей
@@ -32,7 +32,7 @@ class HomogeneousRecombinator(AbstractRecombinator):
                         self._selected_children[i][0][j], self._selected_children[i][1][
                             j] = self._parents_pairs[i][1][j], self._parents_pairs[i][0][j]
 
-            # Преобразуем детей обратно в строку и добавляем их в список потомков
+            #Добавляем ребенка и его родителей в список потомков
             self._selected_children[i] = (
                 self._selected_children[i][0], self._parents_pairs[i][0], self._parents_pairs[i][0])
             self._selected_children[i] = (
