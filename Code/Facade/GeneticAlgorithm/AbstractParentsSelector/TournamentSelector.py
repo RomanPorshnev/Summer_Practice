@@ -11,5 +11,4 @@ class TournamentSelector(AbstractParentsSelector):
             individuals.sort()
             self._selected_parents.append(
                 self._population[individuals[0][1]])
-        print(self._selected_parents)
 
