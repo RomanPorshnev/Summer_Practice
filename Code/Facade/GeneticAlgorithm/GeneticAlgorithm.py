@@ -36,8 +36,8 @@ class GeneticAlgorithm:
         self.__generate_population()
         for individual in self.__population:
             print(
-                f"chromosome = {individual} weight = {self.__compute_weight_of_individual(individual)} cost = "
-                f"{self.__compute_cost_of_individual(individual)}")
+                f"chromosome = {individual} weight = {self.__weight_of_individual(individual)} "
+                f"cost = {self.__cost_of_individual(individual)}")
 
     '''
     Данный метод генерирует начальную популяцию.
@@ -88,7 +88,7 @@ class GeneticAlgorithm:
     Входные данные: особь(хромосома)
     Выходные данные: вес особи
     '''
-    def __compute_weight_of_individual(self, individual):
+    def __weight_of_individual(self, individual):
         weight = 0
         for i in range(len(individual)):
             weight += int(individual[i]) * self.__weights[i]
@@ -99,7 +99,7 @@ class GeneticAlgorithm:
         Входные данные: особь(хромосома)
         Выходные данные: цена особи
         '''
-    def __compute_cost_of_individual(self, individual):
+    def __cost_of_individual(self, individual):
         cost = 0
         for i in range(len(individual)):
             cost += int(individual[i]) * self.__costs[i]
@@ -108,11 +108,13 @@ class GeneticAlgorithm:
 
 if __name__ == "__main__":
     input_data = InputData
-    input_data.weights = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    input_data.costs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    input_data.weights = [random.randint(0, 100) for i in range(10)]
+    input_data.costs = [random.randint(0, 100) for i in range(10)]
+    print(input_data.weights)
+    print(input_data.costs)
     input_data.probability_of_mutation = 0.5
     input_data.probability_of_crossover = 0.5
-    input_data.number_of_individuals = 100
+    input_data.number_of_individuals = 10
     input_data.backpack_capacity = 100
     genetic_algorithm = GeneticAlgorithm(input_data)
     genetic_algorithm.make_population_data_list()
