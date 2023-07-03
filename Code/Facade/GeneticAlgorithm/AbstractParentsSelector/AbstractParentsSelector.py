@@ -19,7 +19,7 @@ class AbstractParentsSelector(Protocol):
     '''
 
     @abc.abstractmethod
-    def make_parents(self) -> None:
+    def make_parents(self) -> list:
         ...
 
     '''

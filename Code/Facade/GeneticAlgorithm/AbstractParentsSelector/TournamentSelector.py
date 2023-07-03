@@ -26,3 +26,4 @@ class TournamentSelector(AbstractParentsSelector):
             # Добавляем индивида с наивысшей приспособленностью (индекс 0) в список выбранных родителей
             self._selected_parents.append(
                 self._population[individuals[0][1]])
+        return self._selected_parents
