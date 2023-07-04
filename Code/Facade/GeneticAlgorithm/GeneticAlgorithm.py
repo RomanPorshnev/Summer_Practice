@@ -34,17 +34,13 @@ class GeneticAlgorithm:
 
     def make_population_data_list(self):
         self.__generate_population()
-        for individual in self.__population:
-            print(
-                f"chromosome = {individual} weight = {self.__weight_of_individual(individual)} "
-                f"cost = {self.__cost_of_individual(individual)}")
 
     '''
     Данный метод генерирует начальную популяцию.
     Выходные данные: сгенерированная начальная популяция
     '''
 
-    def __generate_population(self) -> list:
+    def __generate_population(self) -> None:
         i = 0
         while i < self.__number_of_individuals:
             weight_of_individual = 0
@@ -68,7 +64,6 @@ class GeneticAlgorithm:
                     self.__population.append(chromosome)
                     i += 1
                     break
-        return self.__population
 
     '''
     Данный метод находит индекс предмета, 
@@ -118,3 +113,4 @@ if __name__ == "__main__":
     input_data.backpack_capacity = 100
     genetic_algorithm = GeneticAlgorithm(input_data)
     genetic_algorithm.make_population_data_list()
+    

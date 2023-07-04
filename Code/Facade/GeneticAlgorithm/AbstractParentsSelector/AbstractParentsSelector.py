@@ -22,9 +22,3 @@ class AbstractParentsSelector(Protocol):
     def make_parents(self) -> list:
         ...
 
-    '''
-    Геттер для получения списка отобранных родителей
-    '''
-
-    def get_selected_parents(self):
-        return self._selected_parents

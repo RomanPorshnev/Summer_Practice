@@ -14,8 +14,8 @@ class TournamentSelector(AbstractParentsSelector):
         # Проходимся по популяции
         for i in range(population_len):
             # Выбираем три случайных индивида из популяции
-            individuals = [randint(0, population_len-1), randint(
-                0, population_len-1), randint(0, population_len-1)]
+            individuals = [randint(0, population_len - 1), randint(
+                0, population_len - 1), randint(0, population_len - 1)]
 
             # Создаем список кортежей с индивидами и их соответствующими индексами
             individuals = [(self._population[j], j) for j in individuals]
