@@ -4,6 +4,9 @@ from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
 
 
 class FileLabel(QLabel):
+    """
+    Объект класса - надпись, содержащая функционал drag and drop.
+    """
     def __init__(self):
         super().__init__()
         self.setAlignment(qtc.Qt.AlignCenter)
@@ -33,6 +36,10 @@ class FileLabel(QLabel):
 
 
 class SecondWindow(QtWidgets.QMainWindow):
+    """
+    Объект класса - окно для загрузки пользователем файла.
+    Установка параметров окна и отрисовка ui.
+    """
     submitClicked = qtc.pyqtSignal(str)
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -52,5 +59,9 @@ class SecondWindow(QtWidgets.QMainWindow):
         self.vbox.addWidget(self.btnNext)
 
     def sendSignal(self):
+        """
+        Обработчик нажатия кнопки ДАЛЕЕ.
+        Отправляет путь к файлу родительскому окну.
+        """
         self.submitClicked.emit(self.fileGetter.pathToFile)
         self.close()
