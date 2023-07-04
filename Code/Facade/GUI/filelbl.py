@@ -10,7 +10,8 @@ class FileLabel(QLabel):
     def __init__(self):
         super().__init__()
         self.setAlignment(qtc.Qt.AlignCenter)
-        self.setText("Перетащите файл")
+        self.setText("Перетащите файл\n\nПервая строка - вместительность рюкзака\n\n"
+                     "Далее одна строка - один предмет\n(вес и цена через пробел)")
         self.setAcceptDrops(True)
         self.pathToFile = ''
 
@@ -38,7 +39,7 @@ class FileLabel(QLabel):
 class SecondWindow(QtWidgets.QMainWindow):
     """
     Объект класса - окно для загрузки пользователем файла.
-    Установка параметров окна и отрисовка ui.
+    Установка параметров окна и отрисовка gui.
     """
     submitClicked = qtc.pyqtSignal(str)
     def __init__(self, parent=None):

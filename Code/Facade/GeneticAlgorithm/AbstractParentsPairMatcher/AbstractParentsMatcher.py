@@ -1,5 +1,5 @@
 from typing import Protocol
-import random
+from random import randint
 import abc
 
 
