@@ -18,6 +18,7 @@ class Page3ParamsOfAlg:
         self.mainText2 = QLabel("Введите вероятность кроссинговера (может принимать значения от 60% до 95%):", window)
         self.mainText2.setStyleSheet("font: oblique 13pt \"Umpush\";")
 
+        self.page3lvl = 1
         self.spinParam = QSpinBox(window, value=80, maximum=95, minimum=60, singleStep=5, suffix="%")
         self.window.vbox.insertWidget(2, self.spinParam)
 
@@ -31,13 +32,25 @@ class Page3ParamsOfAlg:
         self.window.vbox.addWidget(self.btnNext)
 
     def page3_mod(self):
-        self.window.crossoverProbability = self.spinParam.value()
-        self.mainText2.setText("Введите размер популяции (может принимать значения от 20 до 100):")
+        if self.page3lvl == 1:
+            #prob of mutation
+            self.window.crossoverProbability = self.spinParam.value() / 100
+            self.mainText2.setText("Введите вероятность мутации (может принимать значения от 0,05% до 1%):")
 
-        self.spinParam.setSuffix("")
-        self.spinParam.setMinimum(20)
-        self.spinParam.setMaximum(100)
-        self.spinParam.setValue(30)
+            self.spinParam.setSuffix(" x 10^-2 %")
+            self.spinParam.setMinimum(5)
+            self.spinParam.setMaximum(100)
+            self.spinParam.setValue(5)
 
-        self.btnNext.clicked.disconnect()
-        self.btnNext.clicked.connect(self.window.choseTypeOfVisual)
+            self.page3lvl = 2
+        elif self.page3lvl == 2:
+            self.window.mutationProbability = self.spinParam.value() / 10000
+            self.mainText2.setText("Введите размер популяции (может принимать значения от 20 до 100):")
+
+            self.spinParam.setSuffix("")
+            self.spinParam.setMinimum(20)
+            self.spinParam.setMaximum(100)
+            self.spinParam.setValue(30)
+
+            self.btnNext.clicked.disconnect()
+            self.btnNext.clicked.connect(self.window.choseTypeOfVisual)

@@ -3,6 +3,7 @@ from filelbl import SecondWindow
 from Page1RadioButtons import Page1RadioButtons
 from Page2InputData import Page2InputData
 from Page3ParamsOfAlg import Page3ParamsOfAlg
+from inputdata import DataPacking
 import sys
 
 
@@ -20,8 +21,10 @@ class Window(QWidget):
         ограничение на вместительность рюкзака
     listOfWeights, listOfCosts : List[int]
         список весов и стоимостей предметов соответсвенно
-    crossoverProbability : int
+    crossoverProbability : float
         вероятность кроссинговера
+    mutationProbability: float
+        вероятность мутации
     countOfPopulation : int
         объем популяции
     pathToFile : str
@@ -41,8 +44,9 @@ class Window(QWidget):
         self.group1res, self.group2res, self.group3res = '', '', ''
         self.weightLimit = 0
         self.listOfWeights, self.listOfCosts = [], []
-        self.crossoverProbability = 0
-        self.countOfPopulation = 0
+        self.crossoverProbability = 0.8
+        self.mutationProbability = 0.01
+        self.countOfPopulation = 30
         self.pathToFile = ''
         self.needOfDataGen = False
         self.defaultParams = False
@@ -100,6 +104,7 @@ class Window(QWidget):
         if self.group2res == "задать самостоятельно":
             self.page3 = Page3ParamsOfAlg(self)
         if self.group2res == "значения по умолчанию":
+            self.defaultParams = True
             self.choseTypeOfVisual()
 
     def errorMes(self, mes):
@@ -140,14 +145,18 @@ class Window(QWidget):
         """
         Определяет страницу для перехода по выбору в группе3 радио кнопок (визуализация решения)
         """
-        self.countOfPopulation = self.page3.spinParam.value()
+        if not self.defaultParams:
+            self.countOfPopulation = self.page3.spinParam.value()
+        self.preparingDataForAlg()
         #if self.group3res == "пошаговая"
 
     def preparingDataForAlg(self):
         """
         Запаковывает данные для передачи в алгоритм.
         """
-        pass
+        dataForALg = DataPacking(self.listOfWeights, self.listOfCosts, self.weightLimit, self.pathToFile,
+                                 self.mutationProbability, self.crossoverProbability, self.countOfPopulation)
+        print(dataForALg)
 
 
 def application():
