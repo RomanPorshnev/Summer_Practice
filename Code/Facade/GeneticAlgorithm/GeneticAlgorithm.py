@@ -113,4 +113,4 @@ if __name__ == "__main__":
     input_data.backpack_capacity = 100
     genetic_algorithm = GeneticAlgorithm(input_data)
     genetic_algorithm.make_population_data_list()
-    
+
