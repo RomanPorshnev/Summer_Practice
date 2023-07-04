@@ -1,4 +1,5 @@
 from typing import Protocol
+from random import randint
 import abc
 
 
@@ -18,4 +19,3 @@ class AbstractParentsMatcher(Protocol):
     @abc.abstractmethod
     def make_parents_pairs(self) -> list:
         ...
-
