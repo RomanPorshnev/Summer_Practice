@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit
+from PyQt5.QtWidgets import QLabel, QPushButton, QLineEdit, QTableWidget, QTableWidgetItem
 
 
 class Page2InputData:
@@ -24,7 +24,7 @@ class Page2InputData:
         self.inputData.returnPressed.connect(self.window.page2_mod)
 
         self.btnNext = QPushButton("далее", window)
-        self.btnNext.setFixedSize(400, 80)
+        self.btnNext.setFixedSize(600, 80)
         self.btnNext.clicked.connect(self.window.choseTypeOfParam)
 
         self.window.vbox.addWidget(self.mainText1)
@@ -34,13 +34,26 @@ class Page2InputData:
 
     def page2_mod(self):
         if self.page2lvl == 1:
-            if self.inputData.text().isdigit():
+            if self.inputData.text().isdigit() and int(self.inputData.text()) > 0:
                 self.window.weightLimit = int(self.inputData.text())
                 self.mainText2.setText("Введите вес и стоимость предмета через пробел:")
                 self.btnForCancelStep = QPushButton("отменить ввод последнего предмета", self.window)
                 self.btnForCancelStep.setFixedSize(600, 80)
                 self.btnForCancelStep.clicked.connect(self.window.deleteLastItem)
                 self.window.vbox.insertWidget(3, self.btnForCancelStep)
+
+                self.mainText3 = QLabel("Текущий набор предметов:", self.window)
+                self.mainText3.setStyleSheet("font: oblique 13pt \"Umpush\";")
+                self.window.vbox.addWidget(self.mainText3)
+
+                self.itemsTable = QTableWidget(self.window)
+                self.itemsTable.setColumnCount(0)
+                self.itemsTable.setRowCount(2)
+                self.itemsTable.setVerticalHeaderLabels(["вес", "цена"])
+                self.itemsTable.setEditTriggers(QTableWidget.NoEditTriggers)
+                self.window.vbox.addWidget(self.itemsTable)
+
+                self.counter = 0
                 self.page2lvl = 2
             else:
                 self.window.errorMes("Неверный формат данных!")
@@ -49,7 +62,12 @@ class Page2InputData:
                 x, y = [int(i) for i in self.inputData.text().split()]
                 self.window.listOfWeights.append(x)
                 self.window.listOfCosts.append(y)
+
+                self.itemsTable.insertColumn(self.counter)
+                self.itemsTable.setColumnWidth(self.counter, 8)
+                self.itemsTable.setItem(0, self.counter, QTableWidgetItem(str(x)))
+                self.itemsTable.setItem(1, self.counter, QTableWidgetItem(str(y)))
+                self.counter += 1
             except ValueError:
                 self.window.errorMes("Неверный формат данных!")
         self.inputData.clear()
-        print(self.window.listOfWeights, self.window.listOfCosts)

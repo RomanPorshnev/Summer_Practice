@@ -1,6 +1,6 @@
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QMessageBox
 
 
 class FileLabel(QLabel):
@@ -10,8 +10,10 @@ class FileLabel(QLabel):
     def __init__(self):
         super().__init__()
         self.setAlignment(qtc.Qt.AlignCenter)
-        self.setText("Перетащите файл\n\nПервая строка - вместительность рюкзака\n\n"
-                     "Далее одна строка - один предмет\n(вес и цена через пробел)")
+        self.setText("Перетащите файл\n\nпервая строка - вместительность рюкзака\n\n"
+                     "далее одна строка - один предмет\n(вес и цена через пробел)\n\n"
+                     "необходимое расширение - txt")
+        self.setStyleSheet("font: oblique 13pt \"Umpush\";")
         self.setAcceptDrops(True)
         self.pathToFile = ''
 
@@ -64,5 +66,12 @@ class SecondWindow(QtWidgets.QMainWindow):
         Обработчик нажатия кнопки ДАЛЕЕ.
         Отправляет путь к файлу родительскому окну.
         """
-        self.submitClicked.emit(self.fileGetter.pathToFile)
-        self.close()
+        if self.fileGetter.pathToFile and self.fileGetter.pathToFile.endswith(".txt"):
+            self.submitClicked.emit(self.fileGetter.pathToFile)
+            self.close()
+        else:
+            msg = QMessageBox()
+            msg.setStyleSheet("color: rgb(244, 12, 12); font: 75 13pt \"Umpush\";")
+            msg.setWindowTitle("неполадки...")
+            msg.setText("Файл не обнаружен!")
+            msg.exec_()

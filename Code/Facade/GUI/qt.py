@@ -1,8 +1,10 @@
 from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QMessageBox
+from PyQt5.QtCore import Qt
 from filelbl import SecondWindow
 from Page1RadioButtons import Page1RadioButtons
 from Page2InputData import Page2InputData
 from Page3ParamsOfAlg import Page3ParamsOfAlg
+from Page4Vizualization import Page4Vizualization
 from inputdata import DataPacking
 import sys
 
@@ -38,7 +40,9 @@ class Window(QWidget):
         super().__init__()
         self.setWindowTitle("Задача о рюкзаке")
         self.setGeometry(300, 300, 1200, 900)
-        self.vbox = QVBoxLayout(self)
+        self.setStyleSheet("background-color: rgb(223, 223, 238);")
+        self.vbox = QVBoxLayout()
+        self.vbox.setAlignment(Qt.AlignCenter)
         self.setLayout(self.vbox)
 
         self.group1res, self.group2res, self.group3res = '', '', ''
@@ -94,18 +98,24 @@ class Window(QWidget):
         """
         Удаляет информацию о последнем добавленном предмете.
         """
-        self.listOfCosts.pop()
-        self.listOfWeights.pop()
+        if self.page2.counter:
+            self.listOfCosts.pop()
+            self.listOfWeights.pop()
+            self.page2.itemsTable.removeColumn(self.page2.counter - 1)
+            self.page2.counter -= 1
 
     def choseTypeOfParam(self):
         """
         Определяет страницу для перехода по выбору в группе2 радио кнопок (задание параметров алгоритма).
         """
-        if self.group2res == "задать самостоятельно":
-            self.page3 = Page3ParamsOfAlg(self)
-        if self.group2res == "значения по умолчанию":
-            self.defaultParams = True
-            self.choseTypeOfVisual()
+        if (self.weightLimit and self.listOfWeights) or self.group1res != "через GUI":
+            if self.group2res == "задать самостоятельно":
+                self.page3 = Page3ParamsOfAlg(self)
+            if self.group2res == "значения по умолчанию":
+                self.defaultParams = True
+                self.choseTypeOfVisual()
+        else:
+            self.errorMes("Нажмите enter")
 
     def errorMes(self, mes):
         """
@@ -148,15 +158,16 @@ class Window(QWidget):
         if not self.defaultParams:
             self.countOfPopulation = self.page3.spinParam.value()
         self.preparingDataForAlg()
+        self.page4 = Page4Vizualization(self)
         #if self.group3res == "пошаговая"
 
     def preparingDataForAlg(self):
         """
         Запаковывает данные для передачи в алгоритм.
         """
-        dataForALg = DataPacking(self.listOfWeights, self.listOfCosts, self.weightLimit, self.pathToFile,
+        self.dataForALg = DataPacking(self.listOfWeights, self.listOfCosts, self.weightLimit, self.pathToFile,
                                  self.mutationProbability, self.crossoverProbability, self.countOfPopulation)
-        print(dataForALg)
+        print(self.dataForALg)
 
 
 def application():
