@@ -1,5 +1,6 @@
+from AbstractParentsSelector.TournamentSelector import AbstractParentsSelector
+from AbstractParentsSelector.TournamentSelector import TournamentSelector
 import random
-
 from dataclasses import dataclass
 
 
@@ -26,21 +27,33 @@ class GeneticAlgorithm:
         self.__number_of_individuals = input_data.number_of_individuals
         self.__backpack_capacity = input_data.backpack_capacity
         self.__population_data_list = []
-        self.__population = []
 
     '''
     Данный метод запускает, останавливает и управляет ГА.
     '''
 
     def make_population_data_list(self):
-        self.__generate_population()
+        population = self.__generate_population()
+        while True:
+            tournament = TournamentSelector(population, self.__weights)
+            parents = tournament.make_parents()
+            panmixia = Panmixia(population)
+            parents_pairs = panmixia.make_parents_pairs()
+            homogeneous_recombination = HomogeneousRecombinator(parents_pairs, self.__probability_of_crossover, 0.5)
+            families = homogeneous_recombination.make_children()
+            changing_mutator = ChangingMutator(families)
+            children = changing_mutator.make_mutation()
+            population_selector = SelectionByDisplacement(self.__init_info_about_individuals(population + children),
+                                                          self.__backpack_capacity)
+            population = population_selector.make_new_population()
 
     '''
     Данный метод генерирует начальную популяцию.
     Выходные данные: сгенерированная начальная популяция
     '''
 
-    def __generate_population(self) -> None:
+    def __generate_population(self) -> list:
+        population = []
         i = 0
         while i < self.__number_of_individuals:
             weight_of_individual = 0
@@ -49,7 +62,7 @@ class GeneticAlgorithm:
             numbers_of_taken_items = []
             while True:
                 if len(numbers_of_items_not_taken) == 0:
-                    self.__population.append(chromosome)
+                    population.append(chromosome)
                     i += 1
                     break
                 index_of_item_not_taken = random.randint(0, len(numbers_of_items_not_taken) - 1)
@@ -61,9 +74,10 @@ class GeneticAlgorithm:
                     index_of_returned_item = self.__get_index_of_returned_item(numbers_of_taken_items)
                     number_of_returned_item = numbers_of_taken_items.pop(index_of_returned_item)
                     chromosome[number_of_returned_item] = '0'
-                    self.__population.append(chromosome)
+                    population.append(chromosome)
                     i += 1
                     break
+        return population
 
     '''
     Данный метод находит индекс предмета, 
@@ -83,7 +97,8 @@ class GeneticAlgorithm:
     Входные данные: особь(хромосома)
     Выходные данные: вес особи
     '''
-    def __weight_of_individual(self, individual):
+
+    def __weight_of_individual(self, individual: list) -> int:
         weight = 0
         for i in range(len(individual)):
             weight += int(individual[i]) * self.__weights[i]
@@ -94,11 +109,18 @@ class GeneticAlgorithm:
         Входные данные: особь(хромосома)
         Выходные данные: цена особи
         '''
-    def __cost_of_individual(self, individual):
+
+    def __cost_of_individual(self, individual: list) -> int:
         cost = 0
         for i in range(len(individual)):
             cost += int(individual[i]) * self.__costs[i]
         return cost
+
+    def __init_info_about_individuals(self, population: list) -> list:
+        info_about_individuals = []
+        for individual in population:
+            info_about_individual = (
+                self.__cost_of_individual(individual), self.__weight_of_individual(individual), individual)
 
 
 if __name__ == "__main__":
@@ -107,10 +129,9 @@ if __name__ == "__main__":
     input_data.costs = [random.randint(0, 100) for i in range(10)]
     print(input_data.weights)
     print(input_data.costs)
-    input_data.probability_of_mutation = 0.5
-    input_data.probability_of_crossover = 0.5
+    input_data.probability_of_mutation = 0.01
+    input_data.probability_of_crossover = 0.8
     input_data.number_of_individuals = 10
     input_data.backpack_capacity = 100
     genetic_algorithm = GeneticAlgorithm(input_data)
     genetic_algorithm.make_population_data_list()
-

@@ -12,7 +12,7 @@ class AbstractMutator(Protocol):
     _selected_population: list  # Список выбранной популяции
     _probabilities_mutation: list  # Список вероятностей мутации
 
-    def __init__(self, children_list: list, changing_probability: int = None):
+    def __init__(self, children_list: list, changing_probability: float = None):
         '''
         Инициализация экземпляра класса AbstractMutator.
 
@@ -46,7 +46,7 @@ class AbstractMutator(Protocol):
             self._probabilities_mutation = [changing_probability] * len(self._children_list)
 
     @abc.abstractmethod
-    def make_population(self) -> list:
+    def make_mutation(self) -> list:
         '''
         Абстрактный метод make_population.
         Должен быть реализован в дочерних классах для создания популяции.
@@ -55,12 +55,3 @@ class AbstractMutator(Protocol):
             list: Список популяции.
         '''
         ...
-
-    def get_selected_children(self):
-        '''
-        Возвращает выбранную популяцию.
-
-        Returns:
-            list: Список выбранной популяции.
-        '''
-        return self._selected_population

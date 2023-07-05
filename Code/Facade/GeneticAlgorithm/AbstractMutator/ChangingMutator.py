@@ -7,7 +7,7 @@ class ChangingMutator(AbstractMutator):
     Он реализует метод make_population() для создания популяции с помощью изменяющейся мутации.
     '''
 
-    def make_population(self) -> list:
+    def make_mutation(self) -> list:
         '''
         Метод make_population() создает популяцию с использованием изменяющейся мутации.
 

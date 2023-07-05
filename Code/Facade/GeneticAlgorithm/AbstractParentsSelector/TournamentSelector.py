@@ -1,4 +1,5 @@
-from AbstractParentsSelector import *
+from AbstractParentsSelector import AbstractParentsSelector
+from random import randint
 
 
 class TournamentSelector(AbstractParentsSelector):
