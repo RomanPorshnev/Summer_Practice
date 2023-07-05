@@ -1,7 +1,17 @@
-from AbstractParentsSelector.TournamentSelector import AbstractParentsSelector
-from AbstractParentsSelector.TournamentSelector import TournamentSelector
+import sys
+from TournamentSelector import *
+from Panmixia import *
+from HomogeneousRecombinator import *
+from ChangingMutator import *
+from SelectionByDisplacement import *
 import random
 from dataclasses import dataclass
+
+sys.path.append("./AbstractParentsSelector")
+sys.path.append("./AbstractParentsPairMatcher")
+sys.path.append("./AbstractMutator")
+sys.path.append("./AbstractRecombinator")
+sys.path.append("./AbstractPopulationSelector")
 
 
 @dataclass
@@ -34,18 +44,33 @@ class GeneticAlgorithm:
 
     def make_population_data_list(self):
         population = self.__generate_population()
-        while True:
-            tournament = TournamentSelector(population, self.__weights)
+        i = 0
+        while i < 10000:
+            # print(population)
+            tournament = TournamentSelector(population,
+                                            [self.__cost_of_individual(individual) for individual in population])
             parents = tournament.make_parents()
-            panmixia = Panmixia(population)
+            panmixia = Panmixia(parents)
             parents_pairs = panmixia.make_parents_pairs()
             homogeneous_recombination = HomogeneousRecombinator(parents_pairs, self.__probability_of_crossover, 0.5)
             families = homogeneous_recombination.make_children()
             changing_mutator = ChangingMutator(families)
             children = changing_mutator.make_mutation()
-            population_selector = SelectionByDisplacement(self.__init_info_about_individuals(population + children),
+            population_selector = SelectionByDisplacement(self.__init_info_about_individuals(parents + children),
                                                           self.__backpack_capacity)
             population = population_selector.make_new_population()
+            i += 1
+        max = 0
+        chromosome = population[0]
+        '''
+                for individual in population:
+            if self.__cost_of_individual(individual) >= max:
+                max = self.__cost_of_individual(individual)
+                chromosome = individual
+        print(chromosome, max, self.__weight_of_individual(chromosome))
+        '''
+        for individual in population:
+            print(individual, self.__cost_of_individual(individual), self.__weight_of_individual(individual))
 
     '''
     Данный метод генерирует начальную популяцию.
@@ -105,10 +130,10 @@ class GeneticAlgorithm:
         return weight
 
     '''
-        Данный метод считает цену особи
-        Входные данные: особь(хромосома)
-        Выходные данные: цена особи
-        '''
+    Данный метод считает цену особи
+    Входные данные: особь(хромосома)
+    Выходные данные: цена особи
+    '''
 
     def __cost_of_individual(self, individual: list) -> int:
         cost = 0
@@ -116,22 +141,65 @@ class GeneticAlgorithm:
             cost += int(individual[i]) * self.__costs[i]
         return cost
 
+    '''
+    Данный метод считает вес особи
+    Входные данные: особь(хромосома)
+    Выходные данные: вес особи
+    '''
+
     def __init_info_about_individuals(self, population: list) -> list:
         info_about_individuals = []
         for individual in population:
             info_about_individual = (
                 self.__cost_of_individual(individual), self.__weight_of_individual(individual), individual)
+            info_about_individuals.append(info_about_individual)
+        return info_about_individuals
+
+
+def knapsack(weights, values, capacity):
+    n = len(weights)
+    # Создаем матрицу размером (n+1) x (capacity+1) и заполняем ее нулями
+    dp = [[0] * (capacity + 1) for _ in range(n + 1)]
+
+    for i in range(1, n + 1):
+        for j in range(1, capacity + 1):
+            # Если текущий предмет помещается в рюкзак
+            if weights[i - 1] <= j:
+                # Выбираем максимальную стоимость между включением или исключением предмета
+                dp[i][j] = max(values[i - 1] + dp[i - 1][j - weights[i - 1]], dp[i - 1][j])
+            else:
+                # Текущий предмет не помещается в рюкзак, поэтому стоимость остается такой же, как и для предыдущих предметов
+                dp[i][j] = dp[i - 1][j]
+
+    # Восстановление решения
+    selected_items = []
+    i = n
+    j = capacity
+    while i > 0 and j > 0:
+        if dp[i][j] != dp[i - 1][j]:
+            # Предмет был выбран
+            selected_items.append(i - 1)
+            j -= weights[i - 1]
+        i -= 1
+
+    # Возвращаем максимальную стоимость и выбранные предметы
+    return dp[n][capacity], selected_items[::-1]
 
 
 if __name__ == "__main__":
-    input_data = InputData
-    input_data.weights = [random.randint(0, 100) for i in range(10)]
-    input_data.costs = [random.randint(0, 100) for i in range(10)]
-    print(input_data.weights)
-    print(input_data.costs)
-    input_data.probability_of_mutation = 0.01
-    input_data.probability_of_crossover = 0.8
-    input_data.number_of_individuals = 10
-    input_data.backpack_capacity = 100
-    genetic_algorithm = GeneticAlgorithm(input_data)
-    genetic_algorithm.make_population_data_list()
+    for j in range(1):
+        input_data = InputData
+        input_data.weights = [random.randint(0, 100) for i in range(10)]
+        input_data.costs = [random.randint(0, 100) for i in range(10)]
+        print(input_data.weights)
+        print(input_data.costs)
+        input_data.probability_of_mutation = 0.01
+        input_data.probability_of_crossover = 0.8
+        input_data.number_of_individuals = 10
+        input_data.backpack_capacity = 100
+        genetic_algorithm = GeneticAlgorithm(input_data)
+        genetic_algorithm.make_population_data_list()
+
+        max_value, selected_items = knapsack(input_data.weights, input_data.costs, input_data.backpack_capacity)
+        print("Максимальная стоимость:", max_value)
+        print("Выбранные предметы (индексы):", selected_items)

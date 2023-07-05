@@ -2,6 +2,11 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/Code/Facade/GeneticAlgorithm/AbstractMutator" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Code/Facade/GeneticAlgorithm/AbstractParentsPairMatcher" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Code/Facade/GeneticAlgorithm/AbstractParentsSelector" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Code/Facade/GeneticAlgorithm/AbstractPopulationSelector" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Code/Facade/GeneticAlgorithm/AbstractRecombinator" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10 (Summer_Practice)" jdkType="Python SDK" />
