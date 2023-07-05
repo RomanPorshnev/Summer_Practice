@@ -1,9 +1,11 @@
 import sys
 from TournamentSelector import *
 from Panmixia import *
+from Outbreeding import *
 from HomogeneousRecombinator import *
 from ChangingMutator import *
 from SelectionByDisplacement import *
+from EliteSelection import *
 import random
 from dataclasses import dataclass
 
@@ -43,42 +45,71 @@ class GeneticAlgorithm:
     '''
 
     def make_population_data_list(self):
-        population = self.__generate_population()
+        population = self.__generate_population(self.__number_of_individuals)
         i = 0
-        while i < 10000:
+        max = 0
+        chromosome = population[0]
+        for individual in population:
+            if self.__cost_of_individual(individual) >= max and self.__weight_of_individual(
+                    individual) <= self.__backpack_capacity:
+                max = self.__cost_of_individual(individual)
+                chromosome = individual
+        absolute_max = max
+        absolute_chromosome = chromosome
+        j = 0
+        # print(absolute_max, absolute_chromosome)
+        k = 0
+        while i < 100000:
+            '''
+                        for individual in population:
+                print(individual, self.__cost_of_individual(individual), self.__weight_of_individual(individual))
+            print("\n\n\n")
+            '''
+
             tournament = TournamentSelector(population,
                                             [self.__cost_of_individual(individual) for individual in population])
             parents = tournament.make_parents()
-            panmixia = Panmixia(parents)
+            panmixia = Outbreeding(parents)
             parents_pairs = panmixia.make_parents_pairs()
             homogeneous_recombination = HomogeneousRecombinator(parents_pairs, 0.5, self.__probability_of_crossover)
             families = homogeneous_recombination.make_children()
             changing_mutator = ChangingMutator(families)
             children = changing_mutator.make_mutation()
-            population_selector = SelectionByDisplacement(self.__init_info_about_individuals(parents + children),
-                                                          self.__backpack_capacity)
-            population = population_selector.make_new_population()
-            i += 1
-        for individual in population:
-            print(individual, self.__cost_of_individual(individual), self.__weight_of_individual(individual))
-        '''
-                for individual in population:
-            if self.__cost_of_individual(individual) >= max:
-                max = self.__cost_of_individual(individual)
-                chromosome = individual
-        print(chromosome, max, self.__weight_of_individual(chromosome))
-        '''
+            population_selector = EliteSelection(self.__init_info_about_individuals(parents + children),
+                                                 self.__backpack_capacity)
+            population = population_selector.make_new_population() + self.__generate_population(
+                int(0.9 * self.__number_of_individuals))
 
+            i += 1
+            max = 0
+            chromosome = population[0]
+            for individual in population:
+                if self.__cost_of_individual(individual) >= max and self.__weight_of_individual(
+                        individual) <= self.__backpack_capacity:
+                    max = self.__cost_of_individual(individual)
+                    chromosome = individual
+            if max > absolute_max:
+                absolute_max = max
+                absolute_chromosome = chromosome
+                j = 0
+            else:
+                j += 1
+            if j > 100:
+                break
+        print(absolute_max)
+        '''
+                
+        '''
 
     '''
     Данный метод генерирует начальную популяцию.
     Выходные данные: сгенерированная начальная популяция
     '''
 
-    def __generate_population(self) -> list:
+    def __generate_population(self, number_of_individuals) -> list:
         population = []
         i = 0
-        while i < self.__number_of_individuals:
+        while i < number_of_individuals:
             weight_of_individual = 0
             chromosome = ['0'] * self.__number_of_items
             numbers_of_items_not_taken = [i for i in range(self.__number_of_items)]
@@ -185,15 +216,15 @@ def knapsack(weights, values, capacity):
 
 
 if __name__ == "__main__":
-    for j in range(1):
+    for j in range(10):
         input_data = InputData
-        input_data.weights = [random.randint(0, 100) for i in range(10)]
-        input_data.costs = [random.randint(0, 100) for i in range(10)]
+        input_data.weights = [random.randint(0, 200) for i in range(100)]
+        input_data.costs = [random.randint(0, 100) for i in range(100)]
         print(input_data.weights)
         print(input_data.costs)
         input_data.probability_of_mutation = 0.01
         input_data.probability_of_crossover = 0.8
-        input_data.number_of_individuals = 10
+        input_data.number_of_individuals = 50
         input_data.backpack_capacity = 100
         genetic_algorithm = GeneticAlgorithm(input_data)
         genetic_algorithm.make_population_data_list()
