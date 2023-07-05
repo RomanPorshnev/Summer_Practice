@@ -46,13 +46,12 @@ class GeneticAlgorithm:
         population = self.__generate_population()
         i = 0
         while i < 10000:
-            # print(population)
             tournament = TournamentSelector(population,
                                             [self.__cost_of_individual(individual) for individual in population])
             parents = tournament.make_parents()
             panmixia = Panmixia(parents)
             parents_pairs = panmixia.make_parents_pairs()
-            homogeneous_recombination = HomogeneousRecombinator(parents_pairs, self.__probability_of_crossover, 0.5)
+            homogeneous_recombination = HomogeneousRecombinator(parents_pairs, 0.5, self.__probability_of_crossover)
             families = homogeneous_recombination.make_children()
             changing_mutator = ChangingMutator(families)
             children = changing_mutator.make_mutation()
@@ -60,8 +59,8 @@ class GeneticAlgorithm:
                                                           self.__backpack_capacity)
             population = population_selector.make_new_population()
             i += 1
-        max = 0
-        chromosome = population[0]
+        for individual in population:
+            print(individual, self.__cost_of_individual(individual), self.__weight_of_individual(individual))
         '''
                 for individual in population:
             if self.__cost_of_individual(individual) >= max:
@@ -69,8 +68,7 @@ class GeneticAlgorithm:
                 chromosome = individual
         print(chromosome, max, self.__weight_of_individual(chromosome))
         '''
-        for individual in population:
-            print(individual, self.__cost_of_individual(individual), self.__weight_of_individual(individual))
+
 
     '''
     Данный метод генерирует начальную популяцию.

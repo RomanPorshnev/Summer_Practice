@@ -11,7 +11,7 @@ class SelectionByDisplacement(AbstractPopulationSelector):
 
     def make_new_population(self):
         self._info_about_individuals.sort(reverse=True)
-        size_of_new_population = (len(self._info_about_individuals) + 1) // 2
+        size_of_new_population = (len(self._info_about_individuals) + 1) // 3
         i = 0
         while i != len(self._info_about_individuals):
             if self._info_about_individuals[i][1] > self._backpack_capacity:
