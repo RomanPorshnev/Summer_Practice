@@ -20,8 +20,8 @@ class DataPacking:
     """
     Заполняет структуру данных в зависимости от опций выбранных пользователем.
     """
-    def __init__(self, weights: List[int], costs: List[int], backpack_capacity: int, path_to_file: str,
-                 probability_of_mutation: float, probability_of_crossover: float, number_of_individuals: int):
+    def __init__(self, weights: List[int], costs: List[int], backpack_capacity: int, probability_of_mutation: float,
+                 probability_of_crossover: float, number_of_individuals: int):
         self.input_data = InputData
         self.input_data.probability_of_crossover = probability_of_crossover
         self.input_data.probability_of_mutation = probability_of_mutation
@@ -29,15 +29,12 @@ class DataPacking:
         self.input_data.weights = weights
         self.input_data.costs = costs
 
-        if not path_to_file:
-            if not weights:
-                self.data_generator()
-            else:
-                self.input_data.weights = weights
-                self.input_data.costs = costs
-                self.input_data.backpack_capacity = backpack_capacity
+        if not weights:
+            self.data_generator()
         else:
-            self.input_from_file(path_to_file)
+            self.input_data.weights = weights
+            self.input_data.costs = costs
+            self.input_data.backpack_capacity = backpack_capacity
 
     def __str__(self):
         return f"веса предметов: {self.input_data.weights}\nстоимости предметов: {self.input_data.costs}\n" \
@@ -54,16 +51,3 @@ class DataPacking:
         for i in range(number_of_items):
             self.input_data.weights.append(random.randint(1, 100))
             self.input_data.costs.append(random.randint(1, 100))
-
-    def input_from_file(self, file_path):
-        """
-        Считывает данные из файла.
-        :param file_path: str
-        """
-        file = open(file_path)
-        self.input_data.backpack_capacity = file.readline()
-        for line in file:
-            x, y = [int(i) for i in line.split()]
-            self.input_data.weights.append(x)
-            self.input_data.costs.append(y)
-        file.close()

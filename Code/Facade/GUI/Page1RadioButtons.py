@@ -21,14 +21,8 @@ class Page1RadioButtons:
         self.rdbtn4 = QRadioButton("задать самостоятельно", self.window)
         self.rdbtn5 = QRadioButton("значения по умолчанию", self.window)
 
-        self.mainText3 = QLabel("Визуализация поиска решения:", self.window)
-
-        self.rdbtn6 = QRadioButton("пошаговая", self.window)
-        self.rdbtn7 = QRadioButton("сразу перейти к решению", self.window)
-
-        self.radioButtons = [self.rdbtn1, self.rdbtn2, self.rdbtn3, self.rdbtn4, self.rdbtn5,
-                             self.rdbtn6, self.rdbtn7]
-        mainTexts = [self.mainText1, self.mainText2, self.mainText2, self.mainText3]
+        self.radioButtons = [self.rdbtn1, self.rdbtn2, self.rdbtn3, self.rdbtn4, self.rdbtn5,]
+        mainTexts = [self.mainText1, self.mainText2, self.mainText2]
         for item in self.radioButtons:
             item.setStyleSheet("font: 25 12pt \"Umpush\";")
         for item in mainTexts:
@@ -41,12 +35,10 @@ class Page1RadioButtons:
         for i in range(2):
             self.group1.addButton(self.radioButtons[i])
             self.group2.addButton(self.radioButtons[i + 3])
-            self.group3.addButton(self.radioButtons[i + 5])
         self.group1.addButton(self.radioButtons[2])
 
         self.group1.buttonClicked.connect(self.window.group1Response)
         self.group2.buttonClicked.connect(self.window.group2Response)
-        self.group3.buttonClicked.connect(self.window.group3Response)
 
         window.vbox.addWidget(self.mainText1)
         window.vbox.addWidget(self.rdbtn1)
@@ -55,7 +47,4 @@ class Page1RadioButtons:
         window.vbox.addWidget(self.mainText2)
         window.vbox.addWidget(self.rdbtn4)
         window.vbox.addWidget(self.rdbtn5)
-        window.vbox.addWidget(self.mainText3)
-        window.vbox.addWidget(self.rdbtn6)
-        window.vbox.addWidget(self.rdbtn7)
         window.vbox.addWidget(self.btnNext)

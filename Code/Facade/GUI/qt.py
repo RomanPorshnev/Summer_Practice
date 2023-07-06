@@ -29,8 +29,6 @@ class Window(QWidget):
         вероятность мутации
     countOfPopulation : int
         объем популяции
-    pathToFile : str
-        путь к файлу с входными данными
     needOfDataGen : boolean
         необходимость генерации случайных входных данных
     defaultParams : boolean
@@ -39,13 +37,13 @@ class Window(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Задача о рюкзаке")
-        self.setGeometry(300, 300, 1200, 900)
+        self.setGeometry(300, 300, 1200, 1000)
         self.setStyleSheet("background-color: rgb(223, 223, 238);")
         self.vbox = QVBoxLayout()
         self.vbox.setAlignment(Qt.AlignCenter)
         self.setLayout(self.vbox)
 
-        self.group1res, self.group2res, self.group3res = '', '', ''
+        self.group1res, self.group2res = '', ''
         self.weightLimit = 0
         self.listOfWeights, self.listOfCosts = [], []
         self.crossoverProbability = 0.8
@@ -68,16 +66,13 @@ class Window(QWidget):
     def group2Response(self, btn):
         self.group2res = btn.text()
 
-    def group3Response(self, btn):
-        self.group3res = btn.text()
-
     def choseTypeOfInput(self):
         """
         Проверяет, в каждой ли группе кнопок выбрана опция.
         Если да, то по выбору в первой группе кнопок, определяет, на какую страницу будет совершен переход.
         Если нет, генерируется сообщение об ошибке.
         """
-        if self.group1res and self.group2res and self.group3res:
+        if self.group1res and self.group2res:
             if self.group1res == "через GUI":
                 self.page2 = Page2InputData(self)
             elif self.group1res == "чтение из файла":
@@ -117,7 +112,7 @@ class Window(QWidget):
         else:
             self.errorMes("Нажмите enter")
 
-    def errorMes(self, mes):
+    def errorMes(self, mes: str):
         """
         Генерирует всплывающее окно с сообщением об ошибке.
         :param mes: str
@@ -136,13 +131,23 @@ class Window(QWidget):
         self.file_window.submitClicked.connect(self.getFilePath)
         self.file_window.show()
 
-    def getFilePath(self, url):
+    def getFilePath(self, url: str):
         """
-        Записывает путь к файлу, полученный из дочернего окна.
+        Считывает данные из файла, полученного из дочернего окна.
         :param url: str
         """
-        self.pathToFile = url
-        self.choseTypeOfParam()
+        try:
+            file = open(url)
+            self.weightLimit = int(file.readline())
+            for line in file:
+                x, y = [int(i) for i in line.split()]
+                self.listOfWeights.append(x)
+                self.listOfCosts.append(y)
+            file.close()
+            self.choseTypeOfParam()
+        except ValueError:
+            self.errorMes("Неверный формат данных!")
+            self.page2withFileInput()
 
     def page3_mod(self):
         """
@@ -165,8 +170,8 @@ class Window(QWidget):
         """
         Запаковывает данные для передачи в алгоритм.
         """
-        self.dataForALg = DataPacking(self.listOfWeights, self.listOfCosts, self.weightLimit, self.pathToFile,
-                                 self.mutationProbability, self.crossoverProbability, self.countOfPopulation)
+        self.dataForALg = DataPacking(self.listOfWeights, self.listOfCosts, self.weightLimit, self.mutationProbability,
+                                      self.crossoverProbability, self.countOfPopulation)
         print(self.dataForALg)
 
 
