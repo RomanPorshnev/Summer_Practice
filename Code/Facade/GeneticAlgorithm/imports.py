@@ -5,7 +5,6 @@ sys.path.insert(0, "./AbstractMutator")
 sys.path.insert(0, "./AbstractRecombinator")
 sys.path.insert(0, "./AbstractPopulationSelector")
 import random
-from dataclasses import dataclass
 #Mutators:
 from ChangingMutator import *
 #Parent's matchers:
@@ -21,3 +20,6 @@ from SelectionByDisplacement import *
 #Recombinators:
 from HomogeneousRecombinator import *
 from SinglePointRecombinator import *
+from InputData import *
+from Modifications import *
+
