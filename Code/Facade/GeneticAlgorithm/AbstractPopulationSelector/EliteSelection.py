@@ -28,8 +28,7 @@ class EliteSelection(AbstractPopulationSelector):
         else:
             for i in range(size_of_new_population):
                 new_population += [self._info_about_individuals[i][2]]
-        return new_population[:len(new_population) // 10]
-
+        return new_population[:len(new_population) // 5]
     '''
     Данный метод добавляет недостающее количество особей (они оштрафованы)
     '''
