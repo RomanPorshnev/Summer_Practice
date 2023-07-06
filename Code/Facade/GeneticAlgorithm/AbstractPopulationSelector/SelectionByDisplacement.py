@@ -4,56 +4,59 @@ from random import randint
 
 class SelectionByDisplacement(AbstractPopulationSelector):
     '''
-    Данный метод формирует новую популяцию на основе родителей и их детей
-    с опорой на характеристические данные о каждом индивиде по приниципу отбора вытеснением.
-    В случае недобора берутся оштрафованные ососби (вес особи > вес рюказака)
+    SelectionByDisplacement - класс, наследующийся от AbstractPopulationSelector.
+    Он реализует метод make_new_population() для создания новой популяции с помощью смещения.
     '''
 
     def make_new_population(self):
-        self._info_about_individuals.sort(reverse=True)
-        size_of_new_population = (len(self._info_about_individuals) + 1) // 3
+        '''
+        Метод make_new_population() создает новую популяцию с использованием смещения.
+
+        Returns:
+            list: Список новой популяции.
+        '''
+
+        self._info_about_individuals = sorted(
+            self._info_about_individuals, key=lambda x: (-x[0], x[1]))
+
         i = 0
-        while i != len(self._info_about_individuals):
-            if self._info_about_individuals[i][1] > self._backpack_capacity:
-                self._info_about_fined_individuals.append(self._info_about_individuals[i])
-                self._info_about_individuals.pop(i)
-                continue
+
+        # Добавляем индивидов в список отобранных, пока не достигнем трети от общего размера, или пока не пройдем все индивиды
+        while len(self._info_about_fined_individuals) < len(self._info_about_individuals) // 3 and i < len(self._info_about_individuals):
+            if self._info_about_individuals[i][1] < self._backpack_capacity:
+                # Проверяем, что у отобранных индивидов нет смежных индивидов
+                if all([(self.hamming_distance(elem, self._info_about_individuals[i][2]) > 0) for elem in self._info_about_fined_individuals]):
+                    self._info_about_fined_individuals.append(
+                        self._info_about_individuals[i][2])
             i += 1
-        new_population = []
-        if size_of_new_population > len(self._info_about_individuals):
-            for i in range(len(self._info_about_individuals)):
-                new_population += [self._info_about_individuals[i][2]]
-            fined_individuals = self.__add_fined_individuals(size_of_new_population - len(self._info_about_individuals))
-            new_population += fined_individuals
-        else:
-            for i in range(size_of_new_population):
-                new_population += [self._info_about_individuals[i][2]]
 
-        return new_population
+        i = 0
 
-    '''
-    Данный метод добавляет недостающее количество особей (они оштрафованы)
-    '''
+        # Добавляем оставшихся индивидов в список отобранных, пока не достигнем трети от общего размера, или пока не пройдем все индивиды
+        while len(self._info_about_fined_individuals) < len(self._info_about_individuals) // 3 and i < len(self._info_about_individuals):
+            if self._info_about_individuals[i] not in self._info_about_fined_individuals:
+                self._info_about_fined_individuals.append(
+                    self._info_about_individuals[i][2])
+            i += 1
 
-    def __add_fined_individuals(self, size_of_shortage):
-        fined_individuals = []
-        self._info_about_fined_individuals.sort(key=lambda x: x[1])
-        for i in range(size_of_shortage):
-            fined_individuals += [self._info_about_fined_individuals[i][2]]
-        return fined_individuals
+        # Возвращаем список отобранных индивидов
+        return self._info_about_fined_individuals
 
+    @staticmethod
+    def hamming_distance(individual1, individual2):
+        '''
+        Статический метод hamming_distance() вычисляет расстояние Хэмминга между двумя индивидами.
 
-if __name__ == "__main__":
-    '''
-               
-    '''
-    for j in range(100000):
-        costs = [randint(0, 100) for i in range(10)]
-        weights = [randint(0, 200) for i in range(10)]
-        chromo = [list(bin(randint(16, 31))[2:]) for i in range(10)]
-        arr = list(zip(costs, weights, chromo))
-        selection_by_displacement = SelectionByDisplacement(arr, 100)
-        l = selection_by_displacement.make_new_population()
-        if len(l) != 5:
-            print("FUCK")
-            break
+        Args:
+            individual1 (str): Первый индивид.
+            individual2 (str): Второй индивид.
+
+        Returns:
+            int: Расстояние Хэмминга.
+        '''
+
+        counter = 0
+        for i in range(len(individual1)):
+            if individual1[i] != individual2[i]:
+                counter += 1
+        return counter
