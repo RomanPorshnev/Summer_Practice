@@ -9,7 +9,8 @@ from dataclasses import dataclass
 
 @dataclass
 class PopulationData:
-    best_chromosome: str
-    price_of_best_chromosome: int
+    best_individual: str
+    cost_of_best_chromosome: int
     weight_of_best_chromosome: int
-    average_cost: int
+    average_cost: float
+    bad_population: bool

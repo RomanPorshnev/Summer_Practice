@@ -13,18 +13,18 @@ class GeneticAlgorithm:
         self.__probability_of_crossover = input_data.probability_of_crossover
         self.__number_of_individuals = input_data.number_of_individuals
         self.__backpack_capacity = input_data.backpack_capacity
-        self.__parents_selector, self.__pair_matcher, self.__recombinator, self.__mutator, \
-        self.__population_selector = input_data.modifications
+        self.__parents_selector, self.__pair_matcher, self.__recombinator, \
+        self.__mutator, self.__population_selector = input_data.modifications
         self.__population_data_list = []
 
     '''
-    Данный метод запускает, останавливает и управляет ГА.
-    '''
-    '''
-    Метод для использования модификаций которые задал пользователь. Ещё не доделан, это прототип
+    Данный метод предназначен для отбора родителей в популяции в зависимисомти
+    от модификации, которую выбрал пользователь.
+    Входные данные: популяция (список особей)
+    Выходные данные: родители (список особей)
     '''
 
-    def application_of_modifications(self, population):
+    def __get_parents(self, population: list) -> list:
         match self.__parents_selector:
             case Modifications.tournament_selection.value:
                 parents_selector = TournamentSelector(population,
@@ -33,24 +33,63 @@ class GeneticAlgorithm:
             case Modifications.roulette_selection:
                 pass
         parents = parents_selector.make_parents()
+        return parents
+
+    '''
+    Данный метод предназначен для составления пар родителей по принципу, который задал пользователь.
+    Входные данные: список родителей
+    Выходные данные: список пар родителей
+    '''
+
+    def __get_parents_pairs(self, parents: list) -> list:
         match self.__pair_matcher:
             case Modifications.panmixia.value:
                 pair_matcher = Panmixia(parents)
             case Modifications.in_and_outbreeding:
                 pair_matcher = Inbreeding(parents)
         parents_pairs = pair_matcher.make_parents_pairs()
+        return parents_pairs
+
+    '''
+    Данный метод предназначен для формирвания семей (потомок 1, потомок 2, родитель 1, родитель 2) 
+    в зависимости от того рекомбинатора, который задал пользователь. 
+    Входные данные: список пар родителей
+    Выходные данные: список семей, где каждая семья - кортеж размерностью 4
+    '''
+
+    def __get_families(self, parents_pairs: list) -> list:
         match self.__recombinator:
             case Modifications.homogeneous_recombination.value:
                 recombination = HomogeneousRecombinator(parents_pairs, 0.5, self.__probability_of_crossover)
             case Modifications.single_point_recombination.value:
                 recombination = SinglePointRecombinator(parents_pairs, 0.5, self.__probability_of_crossover)
         families = recombination.make_children()
+        return families
+
+    '''
+    Данный метод предназначен для получения списка отправленных на мутацию детей (не гарантирует, что все дети мутируют)
+    в зависимости от установленного пользователем мутатора.
+    Входные данные: список семей
+    Выходные данные: список детей
+    '''
+
+    def __get_children(self, families: list) -> list:
         match self.__mutator:
             case Modifications.binary_mutator.value:
                 mutator = ChangingMutator(families, self.__probability_of_mutation)
             case Modifications.adaptive_mutator:
                 mutator = ChangingMutator(families, self.__probability_of_mutation)
         children = mutator.make_mutation()
+        return children
+
+    '''
+    Данный метод формирует новую популяцию из списка родителей и списка детей по тому принципу, 
+    который задал пользователь.
+    Входные данные: список детей и список родителей
+    Выходные данные: новая популяция
+    '''
+
+    def __get_new_population(self, children: list, parents: list) -> list:
         match self.__population_selector:
             case Modifications.selection_by_displacement:
                 population_selector = SelectionByDisplacement(self.__init_info_about_individuals(parents + children),
@@ -62,89 +101,42 @@ class GeneticAlgorithm:
                                                      self.__backpack_capacity)
                 population = population_selector.make_new_population() + self.__generate_population(
                     int(self.__number_of_individuals))
+        return population
 
     def make_population_data_list(self):
         population = self.__generate_population(self.__number_of_individuals)
+        self.__init_population_info(population)
         i = 0
-        max = 0
-        chromosome = population[0]
+        while i < 100:
+            parents = self.__get_parents(population)
+            parents_pairs = self.__get_parents_pairs(parents)
+            families = self.__get_families(parents_pairs)
+            children = self.__get_children(families)
+            population = self.__get_new_population(children, parents)
+            self.__init_population_info(population)
+            print(self.__population_data_list[-1].average_cost - self.__population_data_list[-2].average_cost)
+            print(i)
+    '''
+    Данные метод инициализирует самые важные данные о каждой популяции, который нужно для отобржения графика в GUI.
+    Входные данные: популяция
+    '''
+    def __init_population_info(self, population: list) -> None:
+        sum_cost_of_population = 0
+        max_cost_of_individual = 0
+        best_individual = population[0]
+        bad_population = True
         for individual in population:
-            if self.__cost_of_individual(individual) >= max and self.__weight_of_individual(
+            cost_of_individual = self.__cost_of_individual(individual)
+            sum_cost_of_population += cost_of_individual
+            if cost_of_individual > max_cost_of_individual and self.__weight_of_individual(
                     individual) <= self.__backpack_capacity:
-                max = self.__cost_of_individual(individual)
-                chromosome = individual
-        absolute_max = max
-        absolute_chromosome = chromosome
-        j = 0
-        # print(absolute_max, absolute_chromosome)
-        k = False
-        print('Давайте зададим параметры алгоритма:\n')
-        Parent_Selector_Input = '1'
-        Parent_Matcher_Input = input(
-            'Каким составителем пар воспользуемся? \n 1) Инбридинг \n 2) Аутбридинг \n 3) Панмиксимя \n')
-        Recombinator_Input = input(
-            'Каким рекомбинатором воспользуемся? \n 1) Однородный \n 2) Одноточечный\n')
-        Mutator_Input = '1'
-        Selector_Input = input(
-            'Каким селектором воспользуемся?\n 1) Элитарный \n 2) Вытеснение\n')
-        while i < 10000:
-            '''
-            for individual in population:
-                print(individual, self.__cost_of_individual(individual), self.__weight_of_individual(individual))
-            print("\n\n\n")
-            '''
-            if Parent_Selector_Input == '1':
-                parents_selector = TournamentSelector(population,
-                                                      [self.__cost_of_individual(individual) for individual in
-                                                       population])
-            parents = parents_selector.make_parents()
-            if Parent_Matcher_Input == '1':
-                chosen_parents = Inbreeding(parents)
-            elif Parent_Matcher_Input == '2':
-                chosen_parents = Outbreeding(parents)
-            elif Parent_Matcher_Input == '3':
-                chosen_parents = Panmixia(parents)
-            parents_pairs = chosen_parents.make_parents_pairs()
-            if Recombinator_Input == '1':
-                recombination = HomogeneousRecombinator(
-                    parents_pairs, 0.5, self.__probability_of_crossover)
-            if Recombinator_Input == '2':
-                recombination = SinglePointRecombinator(
-                    parents_pairs, 0.5, self.__probability_of_crossover)
-            families = recombination.make_children()
-            if Mutator_Input == '1':
-                mutator = ChangingMutator(families)
-            children = mutator.make_mutation()
-            if Selector_Input == '1':
-                population_selector = EliteSelection(self.__init_info_about_individuals(parents + children),
-                                                     self.__backpack_capacity)
-                population = population_selector.make_new_population() + self.__generate_population(
-                    int(0.9 * self.__number_of_individuals))
-            if Selector_Input == '2':
-                population_selector = SelectionByDisplacement(self.__init_info_about_individuals(parents + children),
-                                                              self.__backpack_capacity)
-                population = population_selector.make_new_population() + self.__generate_population(
-                    int(self.__number_of_individuals))
-            i += 1
-            max = 0
-            chromosome = population[0]
-            for individual in population:
-                if self.__cost_of_individual(individual) >= max and self.__weight_of_individual(
-                        individual) <= self.__backpack_capacity:
-                    max = self.__cost_of_individual(individual)
-                    chromosome = individual
-            if max > absolute_max:
-                absolute_max = max
-                absolute_chromosome = chromosome
-                j = 0
-            else:
-                j += 1
-            if j > 200 and not k:
-                j = 0
-                k = True
-            if j > 200 and k:
-                break
-        return absolute_max
+                bad_population = False
+                max_cost_of_individual = cost_of_individual
+                best_individual = individual
+        population_data = PopulationData(best_individual, max_cost_of_individual,
+                                         self.__weight_of_individual(best_individual),
+                                         sum_cost_of_population / len(population), bad_population)
+        self.__population_data_list.append(population_data)
 
     '''
     Данный метод генерирует начальную популяцию.
@@ -222,9 +214,9 @@ class GeneticAlgorithm:
         return cost
 
     '''
-    Данный метод считает вес особи
-    Входные данные: особь(хромосома)
-    Выходные данные: вес особи
+    Данный метод инициализирует данные о каждой особи популяции в виде кортежа (цена особи, вес, хромосома)
+    Входные данные: список особей
+    Выходные данные: список кортежей вида (цена особи, вес, хромосома)
     '''
 
     def __init_info_about_individuals(self, population: list) -> list:
@@ -270,8 +262,8 @@ def knapsack(weights, values, capacity):
 if __name__ == "__main__":
     for j in range(10):
         input_data = InputData
-        input_data.weights = [random.randint(0, 200) for i in range(25)]
-        input_data.costs = [random.randint(0, 100) for i in range(25)]
+        input_data.weights = [random.randint(0, 200) for i in range(10)]
+        input_data.costs = [random.randint(0, 100) for i in range(10)]
         input_data.probability_of_mutation = 0.01
         input_data.probability_of_crossover = 0.8
         input_data.number_of_individuals = 20

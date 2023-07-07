@@ -17,3 +17,9 @@ class Modifications(enum.Enum):
     # варианты селекторов популяции
     elite_selection = 8
     selection_by_displacement = 9
+
+
+a = "двоичная"
+b = input()
+if a == b:
+    n.append(Modifications.binary_mutator.value)
