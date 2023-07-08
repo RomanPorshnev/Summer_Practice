@@ -18,7 +18,6 @@ class GeneticAlgorithm:
         self.__parents_selector, self.__pair_matcher, self.__recombinator, \
         self.__mutator, self.__population_selector = input_data.modifications
         self.__population_data_list = []
-        self.__number_of_generations = 100
 
     '''
     Данный метод предназначен для отбора родителей в популяции в зависимисомти
@@ -34,7 +33,9 @@ class GeneticAlgorithm:
                                                       [self.__cost_of_individual(individual) for individual in
                                                        population])
             case Modifications.roulette_selection.value:
-                pass
+                parents_selector = RouletteSelector(population,
+                                                    [self.__cost_of_individual(individual) for individual in
+                                                     population])
         parents = parents_selector.make_parents()
         return parents
 
@@ -95,32 +96,37 @@ class GeneticAlgorithm:
     Выходные данные: новая популяция
     '''
 
-    def __get_new_population(self, children: list, parents: list) -> list:
+    def __get_new_population(self, children: list, population: list) -> list:
         match self.__population_selector:
             case Modifications.selection_by_displacement.value:
-                population_selector = SelectionByDisplacement(self.__init_info_about_individuals(parents + children),
+                population_selector = SelectionByDisplacement(self.__init_info_about_individuals(population + children),
                                                               self.__backpack_capacity)
-                population = population_selector.make_new_population() + self.__generate_population(
+                new_population = population_selector.make_new_population() + self.__generate_population(
                     int(0.9 * self.__number_of_individuals))
             case Modifications.elite_selection.value:
-                population_selector = EliteSelection(self.__init_info_about_individuals(parents + children),
+                population_selector = EliteSelection(self.__init_info_about_individuals(population + children),
                                                      self.__backpack_capacity)
-                population = population_selector.make_new_population() + self.__generate_population(
+                new_population = population_selector.make_new_population() + self.__generate_population(
                     int(self.__number_of_individuals))
-        return population
+        return new_population
 
     def make_population_data_list(self):
         population = self.__generate_population(self.__number_of_individuals)
+        self.__init_population_info(population)
         i = 0
         while True:
             parents = self.__get_parents(population)
-            parents_pairs = self.__get_parents_pairs(parents, i >= self.__number_of_generations)
+            parents_pairs = self.__get_parents_pairs(parents, i > 500)
             families = self.__get_families(parents_pairs)
             children = self.__get_children(families)
-            population = self.__get_new_population(children, parents)
+            population = self.__get_new_population(children, population)
             self.__init_population_info(population)
-            i += 1
-            if i > 2 * self.__number_of_generations:
+            if self.__population_data_list[-1].cost_of_best_chromosome - \
+                    self.__population_data_list[-2].cost_of_best_chromosome == 0:
+                i += 1
+            else:
+                i = 0
+            if i > 1000:
                 break
         return self.__population_data_list[-1].cost_of_best_chromosome
 
@@ -234,7 +240,6 @@ class GeneticAlgorithm:
             info_about_individual = (
                 self.__cost_of_individual(individual), self.__weight_of_individual(individual), individual)
             info_about_individuals.append(info_about_individual)
-        print(info_about_individuals)
         return info_about_individuals
 
 
@@ -272,13 +277,13 @@ def knapsack(weights, values, capacity):
 if __name__ == "__main__":
     for j in range(1):
         input_data = InputData
-        input_data.weights = [random.randint(0, 200) for i in range(3)]
-        input_data.costs = [random.randint(0, 100) for i in range(3)]
+        input_data.weights = [random.randint(0, 200) for i in range(100)]
+        input_data.costs = [random.randint(0, 100) for i in range(100)]
         input_data.probability_of_mutation = 0.01
         input_data.probability_of_crossover = 0.8
-        input_data.number_of_individuals = 10
+        input_data.number_of_individuals = 40
         input_data.backpack_capacity = 100
-        input_data.modifications = [0, 3, 5, 7, 9]
+        input_data.modifications = [1, 3, 5, 7, 8]
         genetic_algorithm = GeneticAlgorithm(input_data)
 
         max_value, selected_items = knapsack(

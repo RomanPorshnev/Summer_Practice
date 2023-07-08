@@ -23,3 +23,4 @@ from SinglePointRecombinator import *
 from InputData import *
 from Modifications import *
 from PopulationData import *
+from RouletteSelector import *

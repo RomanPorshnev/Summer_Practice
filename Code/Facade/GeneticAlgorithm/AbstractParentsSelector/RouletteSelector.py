@@ -1,4 +1,5 @@
 from AbstractParentsSelector import *
+import random
 
 
 class RouletteSelector(AbstractParentsSelector):
