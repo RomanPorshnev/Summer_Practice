@@ -6,9 +6,11 @@ class RouletteSelector(AbstractParentsSelector):
     def make_parents(self):
         # Вычисляем суммарное значение приспособленности
         total_fitness = sum(self._costs)
-
+        if total_fitness == 0:
+            return self._population
         # Вычисляем вероятности выбора каждого индивида
-        probabilities = [fitness / total_fitness for fitness in self._costs]
+        probabilities = [fitness / (total_fitness + weight * (self._backpack_capacity))
+                         for fitness, weight in zip(self._costs, self._weights)]
         # Создаем список границ для рулетки
         wheel = [0]
         cumulative_probability = 0
@@ -26,12 +28,12 @@ class RouletteSelector(AbstractParentsSelector):
                     to_add = self._population[i]
             self._selected_parents.append(to_add)
 
-        # Если ничего не выбрано (например, из-за ошибки округления), возвращаем последний индивид
         return self._selected_parents
 
 
 if __name__ == '__main__':
     arr = ['10011', '11001', '11100', '00110', '00100']
     costs = [10, 100, 32, 51, 16]
-    x = RouletteSelector(arr, costs)
+    weights = [50, 10, 20, 31, 3]
+    x = RouletteSelector(arr, costs, weights, 20)
     print(x.make_parents())
