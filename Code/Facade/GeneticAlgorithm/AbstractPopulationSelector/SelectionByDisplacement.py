@@ -15,10 +15,9 @@ class SelectionByDisplacement(AbstractPopulationSelector):
         Returns:
             list: Список новой популяции.
         '''
-
         self._info_about_individuals = sorted(
             self._info_about_individuals, key=lambda x: (-x[0], x[1]))
-
+        
         i = 0
 
         # Добавляем индивидов в список отобранных, пока не достигнем трети от общего размера, или пока не пройдем все индивиды
@@ -40,6 +39,7 @@ class SelectionByDisplacement(AbstractPopulationSelector):
             i += 1
 
         # Возвращаем список отобранных индивидов
+        
         return self._info_about_fined_individuals
 
     @staticmethod
@@ -55,8 +55,11 @@ class SelectionByDisplacement(AbstractPopulationSelector):
             int: Расстояние Хэмминга.
         '''
 
-        counter = 0
-        for i in range(len(individual1)):
-            if individual1[i] != individual2[i]:
-                counter += 1
-        return counter
+        num1 = int(individual1, 2) 
+        num2 = int(individual2, 2) 
+    
+        xor_result = num1 ^ num2  
+        count = bin(xor_result).count('1')  
+
+        
+        return count
