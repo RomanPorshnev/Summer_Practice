@@ -16,7 +16,7 @@ class GeneticAlgorithm:
         self.__number_of_individuals = input_data.number_of_individuals
         self.__backpack_capacity = input_data.backpack_capacity
         self.__parents_selector, self.__pair_matcher, self.__recombinator, \
-        self.__mutator, self.__population_selector = input_data.modifications
+            self.__mutator, self.__population_selector = input_data.modifications
         self.__population_data_list = []
 
     '''
@@ -31,11 +31,13 @@ class GeneticAlgorithm:
             case Modifications.tournament_selection.value:
                 parents_selector = TournamentSelector(population,
                                                       [self.__cost_of_individual(individual) for individual in
-                                                       population])
+                                                       population], [self.__weight_of_individual(individual) for individual in
+                                                                     population], self.__backpack_capacity)
             case Modifications.roulette_selection.value:
                 parents_selector = RouletteSelector(population,
                                                     [self.__cost_of_individual(individual) for individual in
-                                                     population])
+                                                     population], [self.__weight_of_individual(individual) for individual in
+                                                                   population], self.__backpack_capacity)
         parents = parents_selector.make_parents()
         return parents
 
@@ -67,9 +69,11 @@ class GeneticAlgorithm:
     def __get_families(self, parents_pairs: list) -> list:
         match self.__recombinator:
             case Modifications.homogeneous_recombination.value:
-                recombination = HomogeneousRecombinator(parents_pairs, 0.5, self.__probability_of_crossover)
+                recombination = HomogeneousRecombinator(
+                    parents_pairs, 0.5, self.__probability_of_crossover)
             case Modifications.single_point_recombination.value:
-                recombination = SinglePointRecombinator(parents_pairs, 0.5, self.__probability_of_crossover)
+                recombination = SinglePointRecombinator(
+                    parents_pairs, 0.5, self.__probability_of_crossover)
         families = recombination.make_children()
         return families
 
@@ -83,9 +87,11 @@ class GeneticAlgorithm:
     def __get_children(self, families: list) -> list:
         match self.__mutator:
             case Modifications.binary_mutator.value:
-                mutator = ChangingMutator(families, self.__probability_of_mutation)
+                mutator = ChangingMutator(
+                    families, self.__probability_of_mutation)
             case Modifications.adaptive_mutator.value:
-                mutator = ChangingMutator(families, self.__probability_of_mutation)
+                mutator = ChangingMutator(
+                    families, self.__probability_of_mutation)
         children = mutator.make_mutation()
         return children
 
@@ -108,13 +114,18 @@ class GeneticAlgorithm:
                                                      self.__backpack_capacity)
                 new_population = population_selector.make_new_population() + self.__generate_population(
                     int(self.__number_of_individuals))
+            case Modifications.truncation_selection.value:
+                population_selector = TruncationSelection(self.__init_info_about_individuals(
+                    population + children), self.__backpack_capacity)
+                new_population = population_selector.make_new_population() + self.__generate_population(
+                    int(self.__number_of_individuals))
         return new_population
 
     def make_population_data_list(self):
         population = self.__generate_population(self.__number_of_individuals)
         self.__init_population_info(population)
         i = 0
-        while True:
+        while i < 1000:
             parents = self.__get_parents(population)
             parents_pairs = self.__get_parents_pairs(parents, i > 500)
             families = self.__get_families(parents_pairs)
@@ -128,6 +139,7 @@ class GeneticAlgorithm:
                 i = 0
             if i > 1000:
                 break
+            #print(self.__population_data_list[-1].cost_of_best_chromosome)
         return self.__population_data_list[-1].cost_of_best_chromosome
 
     '''
@@ -149,7 +161,8 @@ class GeneticAlgorithm:
                 max_cost_of_individual = cost_of_individual
                 best_individual = individual
         population_data = PopulationData(best_individual, max_cost_of_individual,
-                                         self.__weight_of_individual(best_individual),
+                                         self.__weight_of_individual(
+                                             best_individual),
                                          sum_cost_of_population / len(population), bad_population)
         self.__population_data_list.append(population_data)
 
@@ -254,7 +267,7 @@ def knapsack(weights, values, capacity):
             if weights[i - 1] <= j:
                 # Выбираем максимальную стоимость между включением или исключением предмета
                 dp[i][j] = max(values[i - 1] + dp[i - 1]
-                [j - weights[i - 1]], dp[i - 1][j])
+                               [j - weights[i - 1]], dp[i - 1][j])
             else:
                 # Текущий предмет не помещается в рюкзак, поэтому стоимость остается такой же, как и для предыдущих предметов
                 dp[i][j] = dp[i - 1][j]
@@ -275,18 +288,18 @@ def knapsack(weights, values, capacity):
 
 
 if __name__ == "__main__":
-    for j in range(1):
+    for j in range(99, 101):
         input_data = InputData
-        input_data.weights = [random.randint(0, 200) for i in range(100)]
-        input_data.costs = [random.randint(0, 100) for i in range(100)]
+        input_data.weights = [random.randint(1, 200) for i in range(j)]
+        input_data.costs = [random.randint(1, 100) for i in range(j)]
         input_data.probability_of_mutation = 0.01
         input_data.probability_of_crossover = 0.8
         input_data.number_of_individuals = 40
-        input_data.backpack_capacity = 100
-        input_data.modifications = [1, 3, 5, 7, 8]
+        input_data.backpack_capacity = 20
+        input_data.modifications = [0, 3, 5, 7, 8]
         genetic_algorithm = GeneticAlgorithm(input_data)
 
         max_value, selected_items = knapsack(
             input_data.weights, input_data.costs, input_data.backpack_capacity)
         print(
-            f"Максимальная стоимость: {max_value}, ген алгоритм: {genetic_algorithm.make_population_data_list()}\n\n\n")
+            f"Максимальная стоимость: {max_value}, ген алгоритм: {genetic_algorithm.make_population_data_list()}, количество вещей: {j} ")
