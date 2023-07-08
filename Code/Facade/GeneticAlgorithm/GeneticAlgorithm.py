@@ -18,6 +18,7 @@ class GeneticAlgorithm:
         self.__parents_selector, self.__pair_matcher, self.__recombinator, \
         self.__mutator, self.__population_selector = input_data.modifications
         self.__population_data_list = []
+        self.__number_of_generations = 100
 
     '''
     Данный метод предназначен для отбора родителей в популяции в зависимисомти
@@ -43,12 +44,15 @@ class GeneticAlgorithm:
     Выходные данные: список пар родителей
     '''
 
-    def __get_parents_pairs(self, parents: list) -> list:
+    def __get_parents_pairs(self, parents: list, clarify: bool) -> list:
         match self.__pair_matcher:
             case Modifications.panmixia.value:
                 pair_matcher = Panmixia(parents)
             case Modifications.in_and_outbreeding.value:
-                pair_matcher = Inbreeding(parents)
+                if clarify:
+                    pair_matcher = Inbreeding(parents)
+                else:
+                    pair_matcher = Outbreeding(parents)
         parents_pairs = pair_matcher.make_parents_pairs()
         return parents_pairs
 
@@ -105,52 +109,18 @@ class GeneticAlgorithm:
                     int(self.__number_of_individuals))
         return population
 
-    def __stop_algorithm(self, population: list) -> bool:
-        sum_of_population = 0
-        if abs(self.__population_data_list[-1].average_cost - self.__population_data_list[-2].average_cost) < 1:
-            for individual_1 in population:
-                for individual_2 in population:
-                    sum_of_population += math.sqrt(
-                        abs(self.__cost_of_individual(individual_1) ** 2 - self.__cost_of_individual(
-                            individual_2) ** 2))
-            min_cost_of_individual = self.__cost_of_individual(population[0])
-            index_of_min_cost_individual = 0
-            for i in range(len(population)):
-                cost_of_individual = self.__cost_of_individual(population[i])
-                if cost_of_individual < min_cost_of_individual:
-                    min_cost_of_individual = cost_of_individual
-                    index_of_min_cost_individual = i
-                    a = min_cost_of_individual
-            population.pop(index_of_min_cost_individual)
-            min_cost_of_individual = population[0]
-            index_of_min_cost_individual = 0
-            for i in range(len(population)):
-                cost_of_individual = self.__cost_of_individual(population[i])
-                if cost_of_individual < min_cost_of_individual:
-                    min_cost_of_individual = cost_of_individual
-                    index_of_min_cost_individual = i
-            b = min_cost_of_individual
-            print(f"e_average = {sum_of_population / (len(population) + 1)} delta = {abs(a - b)}")
-            if sum_of_population / len(population) < 1:
-                return True
-            else:
-                return False
-        else:
-            return False
-
     def make_population_data_list(self):
         population = self.__generate_population(self.__number_of_individuals)
-        self.__init_population_info(population)
         i = 0
         while True:
             parents = self.__get_parents(population)
-            parents_pairs = self.__get_parents_pairs(parents)
+            parents_pairs = self.__get_parents_pairs(parents, i >= self.__number_of_generations)
             families = self.__get_families(parents_pairs)
             children = self.__get_children(families)
             population = self.__get_new_population(children, parents)
             self.__init_population_info(population)
             i += 1
-            if self.__stop_algorithm(population):
+            if i > 2 * self.__number_of_generations:
                 break
         return self.__population_data_list[-1].cost_of_best_chromosome
 
@@ -264,6 +234,7 @@ class GeneticAlgorithm:
             info_about_individual = (
                 self.__cost_of_individual(individual), self.__weight_of_individual(individual), individual)
             info_about_individuals.append(info_about_individual)
+        print(info_about_individuals)
         return info_about_individuals
 
 
@@ -299,13 +270,13 @@ def knapsack(weights, values, capacity):
 
 
 if __name__ == "__main__":
-    for j in range(10):
+    for j in range(1):
         input_data = InputData
-        input_data.weights = [random.randint(0, 200) for i in range(5)]
-        input_data.costs = [random.randint(0, 100) for i in range(5)]
+        input_data.weights = [random.randint(0, 200) for i in range(3)]
+        input_data.costs = [random.randint(0, 100) for i in range(3)]
         input_data.probability_of_mutation = 0.01
         input_data.probability_of_crossover = 0.8
-        input_data.number_of_individuals = 5
+        input_data.number_of_individuals = 10
         input_data.backpack_capacity = 100
         input_data.modifications = [0, 3, 5, 7, 9]
         genetic_algorithm = GeneticAlgorithm(input_data)
