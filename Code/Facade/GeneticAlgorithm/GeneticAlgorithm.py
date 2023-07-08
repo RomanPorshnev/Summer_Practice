@@ -1,3 +1,5 @@
+import math
+
 from imports import *
 
 
@@ -30,7 +32,7 @@ class GeneticAlgorithm:
                 parents_selector = TournamentSelector(population,
                                                       [self.__cost_of_individual(individual) for individual in
                                                        population])
-            case Modifications.roulette_selection:
+            case Modifications.roulette_selection.value:
                 pass
         parents = parents_selector.make_parents()
         return parents
@@ -45,7 +47,7 @@ class GeneticAlgorithm:
         match self.__pair_matcher:
             case Modifications.panmixia.value:
                 pair_matcher = Panmixia(parents)
-            case Modifications.in_and_outbreeding:
+            case Modifications.in_and_outbreeding.value:
                 pair_matcher = Inbreeding(parents)
         parents_pairs = pair_matcher.make_parents_pairs()
         return parents_pairs
@@ -77,7 +79,7 @@ class GeneticAlgorithm:
         match self.__mutator:
             case Modifications.binary_mutator.value:
                 mutator = ChangingMutator(families, self.__probability_of_mutation)
-            case Modifications.adaptive_mutator:
+            case Modifications.adaptive_mutator.value:
                 mutator = ChangingMutator(families, self.__probability_of_mutation)
         children = mutator.make_mutation()
         return children
@@ -91,35 +93,72 @@ class GeneticAlgorithm:
 
     def __get_new_population(self, children: list, parents: list) -> list:
         match self.__population_selector:
-            case Modifications.selection_by_displacement:
+            case Modifications.selection_by_displacement.value:
                 population_selector = SelectionByDisplacement(self.__init_info_about_individuals(parents + children),
                                                               self.__backpack_capacity)
                 population = population_selector.make_new_population() + self.__generate_population(
                     int(0.9 * self.__number_of_individuals))
-            case Modifications.elite_selection:
+            case Modifications.elite_selection.value:
                 population_selector = EliteSelection(self.__init_info_about_individuals(parents + children),
                                                      self.__backpack_capacity)
                 population = population_selector.make_new_population() + self.__generate_population(
                     int(self.__number_of_individuals))
         return population
 
+    def __stop_algorithm(self, population: list) -> bool:
+        sum_of_population = 0
+        if abs(self.__population_data_list[-1].average_cost - self.__population_data_list[-2].average_cost) < 1:
+            for individual_1 in population:
+                for individual_2 in population:
+                    sum_of_population += math.sqrt(
+                        abs(self.__cost_of_individual(individual_1) ** 2 - self.__cost_of_individual(
+                            individual_2) ** 2))
+            min_cost_of_individual = self.__cost_of_individual(population[0])
+            index_of_min_cost_individual = 0
+            for i in range(len(population)):
+                cost_of_individual = self.__cost_of_individual(population[i])
+                if cost_of_individual < min_cost_of_individual:
+                    min_cost_of_individual = cost_of_individual
+                    index_of_min_cost_individual = i
+                    a = min_cost_of_individual
+            population.pop(index_of_min_cost_individual)
+            min_cost_of_individual = population[0]
+            index_of_min_cost_individual = 0
+            for i in range(len(population)):
+                cost_of_individual = self.__cost_of_individual(population[i])
+                if cost_of_individual < min_cost_of_individual:
+                    min_cost_of_individual = cost_of_individual
+                    index_of_min_cost_individual = i
+            b = min_cost_of_individual
+            print(f"e_average = {sum_of_population / (len(population) + 1)} delta = {abs(a - b)}")
+            if sum_of_population / len(population) < 1:
+                return True
+            else:
+                return False
+        else:
+            return False
+
     def make_population_data_list(self):
         population = self.__generate_population(self.__number_of_individuals)
         self.__init_population_info(population)
         i = 0
-        while i < 100:
+        while True:
             parents = self.__get_parents(population)
             parents_pairs = self.__get_parents_pairs(parents)
             families = self.__get_families(parents_pairs)
             children = self.__get_children(families)
             population = self.__get_new_population(children, parents)
             self.__init_population_info(population)
-            print(self.__population_data_list[-1].average_cost - self.__population_data_list[-2].average_cost)
-            print(i)
+            i += 1
+            if self.__stop_algorithm(population):
+                break
+        return self.__population_data_list[-1].cost_of_best_chromosome
+
     '''
     Данные метод инициализирует самые важные данные о каждой популяции, который нужно для отобржения графика в GUI.
     Входные данные: популяция
     '''
+
     def __init_population_info(self, population: list) -> None:
         sum_cost_of_population = 0
         max_cost_of_individual = 0
@@ -262,13 +301,13 @@ def knapsack(weights, values, capacity):
 if __name__ == "__main__":
     for j in range(10):
         input_data = InputData
-        input_data.weights = [random.randint(0, 200) for i in range(10)]
-        input_data.costs = [random.randint(0, 100) for i in range(10)]
+        input_data.weights = [random.randint(0, 200) for i in range(5)]
+        input_data.costs = [random.randint(0, 100) for i in range(5)]
         input_data.probability_of_mutation = 0.01
         input_data.probability_of_crossover = 0.8
-        input_data.number_of_individuals = 20
+        input_data.number_of_individuals = 5
         input_data.backpack_capacity = 100
-        input_data.modifications = [1, 2, 3, 4, 5]
+        input_data.modifications = [0, 3, 5, 7, 9]
         genetic_algorithm = GeneticAlgorithm(input_data)
 
         max_value, selected_items = knapsack(
