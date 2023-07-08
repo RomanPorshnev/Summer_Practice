@@ -17,8 +17,8 @@ class TournamentSelector(AbstractParentsSelector):
             individuals = [randint(0, population_len - 1), randint(
                 0, population_len - 1), randint(0, population_len - 1)]
 
-            # Создаем список кортежей с индивидами и их соответствующими индексами
-            individuals = [(self._costs[j], self._population[j], j)
+                # Создаем список кортежей с индивидами и их соответствующими индексами
+            individuals = [(self._costs[j] - self._weights[j] * (self._weights[j] > self._backpack_capacity), self._population[j], j)
                            for j in individuals]
 
             # Сортируем индивидов по их приспособленности (предполагая, что они могут быть отсортированы)
@@ -30,7 +30,7 @@ class TournamentSelector(AbstractParentsSelector):
 
 
 if __name__ == '__main__':
-    arr = ['10011', '11001', '11100', '00110', '00100']
+    arr = ['10011', '11001', '11100', '00110', '00100'] 
     costs = [10, 100, 32, 51, 16]
     x = TournamentSelector(arr, costs)
     print(x.make_parents())
