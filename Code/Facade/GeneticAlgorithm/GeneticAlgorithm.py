@@ -114,13 +114,13 @@ class GeneticAlgorithm:
                                                      self.__backpack_capacity)
                 new_population = population_selector.make_new_population() + self.__generate_population(
                     int(self.__number_of_individuals))
-            case Modifications.truncation_selection.value:
-                population_selector = TruncationSelection(self.__init_info_about_individuals(
-                    population + children), self.__backpack_capacity)
-                new_population = population_selector.make_new_population() + self.__generate_population(
-                    int(self.__number_of_individuals))
         return new_population
-
+    '''
+    Данный метод запускает и останавливает генетический алгоритм, 
+    является посредником в обмене данными между модулями ГА.
+    Выходные данные: список структур, в каждой из которых хранится самая важная 
+    информация о каждой популяции (понадобится для отображения в GUI)
+    '''
     def make_population_data_list(self):
         population = self.__generate_population(self.__number_of_individuals)
         self.__init_population_info(population)
@@ -139,7 +139,6 @@ class GeneticAlgorithm:
                 i = 0
             if i > 1000:
                 break
-            #print(self.__population_data_list[-1].cost_of_best_chromosome)
         return self.__population_data_list[-1].cost_of_best_chromosome
 
     '''
@@ -256,36 +255,16 @@ class GeneticAlgorithm:
         return info_about_individuals
 
 
-def knapsack(weights, values, capacity):
-    n = len(weights)
-    # Создаем матрицу размером (n+1) x (capacity+1) и заполняем ее нулями
-    dp = [[0] * (capacity + 1) for _ in range(n + 1)]
-
-    for i in range(1, n + 1):
-        for j in range(1, capacity + 1):
-            # Если текущий предмет помещается в рюкзак
-            if weights[i - 1] <= j:
-                # Выбираем максимальную стоимость между включением или исключением предмета
-                dp[i][j] = max(values[i - 1] + dp[i - 1]
-                               [j - weights[i - 1]], dp[i - 1][j])
-            else:
-                # Текущий предмет не помещается в рюкзак, поэтому стоимость остается такой же, как и для предыдущих предметов
-                dp[i][j] = dp[i - 1][j]
-
-    # Восстановление решения
-    selected_items = []
-    i = n
-    j = capacity
-    while i > 0 and j > 0:
-        if dp[i][j] != dp[i - 1][j]:
-            # Предмет был выбран
-            selected_items.append(i - 1)
-            j -= weights[i - 1]
-        i -= 1
-
-    # Возвращаем максимальную стоимость и выбранные предметы
-    return dp[n][capacity], selected_items[::-1]
-
+if __name__ == "__main__":
+    for j in range(10):
+        input_data = InputData
+        input_data.weights = [random.randint(0, 200) for i in range(50)]
+        input_data.costs = [random.randint(0, 100) for i in range(50)]
+        input_data.probability_of_mutation = 0.01
+        input_data.probability_of_crossover = 0.8
+        input_data.number_of_individuals = 30
+        input_data.backpack_capacity = 100
+        input_data.modifications = [0, 2, 4, 6, 8]
 
 if __name__ == "__main__":
     for j in range(99, 101):
@@ -301,5 +280,5 @@ if __name__ == "__main__":
 
         max_value, selected_items = knapsack(
             input_data.weights, input_data.costs, input_data.backpack_capacity)
-        print(
-            f"Максимальная стоимость: {max_value}, ген алгоритм: {genetic_algorithm.make_population_data_list()}, количество вещей: {j} ")
+        a = genetic_algorithm.make_population_data_list()
+        print((max_value - a) / a)
