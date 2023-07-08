@@ -53,7 +53,7 @@ class Page2InputData:
                 self.itemsTable.setEditTriggers(QTableWidget.NoEditTriggers)
                 self.window.vbox.addWidget(self.itemsTable)
 
-                self.counter = 0
+                self.counterOfItems = 0
                 self.page2lvl = 2
             else:
                 self.window.errorMes("Неверный формат данных!")
@@ -63,11 +63,11 @@ class Page2InputData:
                 self.window.listOfWeights.append(x)
                 self.window.listOfCosts.append(y)
 
-                self.itemsTable.insertColumn(self.counter)
-                self.itemsTable.setColumnWidth(self.counter, 8)
-                self.itemsTable.setItem(0, self.counter, QTableWidgetItem(str(x)))
-                self.itemsTable.setItem(1, self.counter, QTableWidgetItem(str(y)))
-                self.counter += 1
+                self.itemsTable.insertColumn(self.counterOfItems)
+                self.itemsTable.setColumnWidth(self.counterOfItems, 8)
+                self.itemsTable.setItem(0, self.counterOfItems, QTableWidgetItem(str(x)))
+                self.itemsTable.setItem(1, self.counterOfItems, QTableWidgetItem(str(y)))
+                self.counterOfItems += 1
             except ValueError:
                 self.window.errorMes("Неверный формат данных!")
         self.inputData.clear()

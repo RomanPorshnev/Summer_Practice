@@ -8,7 +8,7 @@ class Page1RadioButtons:
     def __init__(self, window):
         self.window = window
 
-        self.group1, self.group2, self.group3 = QButtonGroup(self.window), QButtonGroup(self.window), QButtonGroup(self.window)
+        self.group1, self.group2 = QButtonGroup(self.window), QButtonGroup(self.window)
 
         self.mainText1 = QLabel("Способ задания входных данных:", self.window)
 
@@ -21,14 +21,14 @@ class Page1RadioButtons:
         self.rdbtn4 = QRadioButton("задать самостоятельно", self.window)
         self.rdbtn5 = QRadioButton("значения по умолчанию", self.window)
 
-        self.radioButtons = [self.rdbtn1, self.rdbtn2, self.rdbtn3, self.rdbtn4, self.rdbtn5,]
-        mainTexts = [self.mainText1, self.mainText2, self.mainText2]
+        self.radioButtons = [self.rdbtn1, self.rdbtn2, self.rdbtn3, self.rdbtn4, self.rdbtn5]
+        mainTexts = [self.mainText1, self.mainText2]
         for item in self.radioButtons:
             item.setStyleSheet("font: 25 12pt \"Umpush\";")
         for item in mainTexts:
             item.setStyleSheet("font: oblique 14pt \"Umpush\";")
 
-        self.btnNext = QPushButton("далее", window)
+        self.btnNext = QPushButton("далее", self.window)
         self.btnNext.setFixedSize(400, 80)
         self.btnNext.clicked.connect(self.window.choseTypeOfInput)
 
