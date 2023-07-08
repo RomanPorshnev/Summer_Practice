@@ -33,18 +33,19 @@ class Page4Vizualization:
             self.window.vbox.itemAt(i).widget().close()
             self.window.vbox.takeAt(i)
 
-        self.mainText1 = QLabel("Функция качества решения (черный - лучшее, красный - среднее)", window)
+        self.mainText1 = QLabel("Функция качества решения", window)
         self.mainText1.setStyleSheet("font: oblique 14pt \"Umpush\";")
 
         self.textStep = QLabel("шаг 1", window)
         self.textStep.setStyleSheet("font: oblique 14pt \"Umpush\";")
 
         self.graphic = PlotWidget()
+        self.graphic.addLegend()
         self.stepCounter = 1
         self.curve = self.graphic.plot(x = [0, self.stepCounter], y = [0, self.steps[0].price_of_best_chromosome],
-                                       pen = {'color':'black', 'width':5})
+                                       pen = {'color':'black', 'width':5}, name = "best cost")
         self.curveAvg = self.graphic.plot(x = [0, 1, 2, 3, 4], y = [10, 20, 5, 6, 10],
-                                       pen = {'color':'red', 'width':5})
+                                       pen = {'color':'red', 'width':5}, name = "average cost")
         self.graphic.setBackground('w')
 
         self.mainText2 = QLabel("Лучшее решение", window)
