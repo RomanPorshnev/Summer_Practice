@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QMessageBox
 from PyQt5.QtCore import Qt
 from filelbl import SecondWindow
 from Page1RadioButtons import Page1RadioButtons
@@ -6,6 +6,7 @@ from Page2InputData import Page2InputData
 from Page3ParamsOfAlg import Page3ParamsOfAlg
 from Page4Vizualization import Page4Vizualization
 from inputdata import DataPacking
+from GeneticAlgorithm import *
 import sys
 
 
@@ -34,6 +35,7 @@ class Window(QWidget):
     defaultParams : boolean
         необходимость использования дефолтных параметров алгоритма
     """
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Задача о рюкзаке")
@@ -111,7 +113,7 @@ class Window(QWidget):
                 self.page3 = Page3ParamsOfAlg(self)
             if self.group2res == "значения по умолчанию":
                 self.defaultParams = True
-                self.choseTypeOfVisual()
+                self.run_genetic_algorithm()
         else:
             self.errorMes("Нажмите enter")
 
@@ -168,6 +170,7 @@ class Window(QWidget):
         Отрисовка модификации страницы3 (введение объема популяции).
         """
         self.page3.page3_mod2()
+        print("\n")
 
     def group1algResponse(self, btn):
         self.group1algRes = btn.text()
@@ -184,15 +187,17 @@ class Window(QWidget):
     def group5algResponse(self, btn):
         self.group5algRes = btn.text()
 
-    def choseTypeOfVisual(self):
+    def run_genetic_algorithm(self):
         """
         Определяет страницу для перехода по выбору в группе3 радио кнопок (визуализация решения)
         """
         if not self.defaultParams:
             self.countOfPopulation = self.page3.spinParam.value()
         self.preparingDataForAlg()
-        self.page4 = Page4Vizualization(self)
-        #if self.group3res == "пошаговая"
+        genetic_algorithm = GeneticAlgorithm(self.dataForALg.input_data)
+        population_data_list = genetic_algorithm.run()
+        self.page4 = Page4Vizualization(self, population_data_list)
+        # if self.group3res == "пошаговая"
 
     def PrevStepOfAlg(self):
         """
@@ -202,16 +207,16 @@ class Window(QWidget):
             self.page4.stepCounter -= 1
             k = self.page4.stepCounter
             self.page4.textStep.setText(f"шаг {k}")
-            countingArr = [i for i in range(k+1)]
+            countingArr = [i for i in range(k + 1)]
             yArr, yArrAvg = [0], [0]
             for i in range(k):
                 yArr.append(self.page4.steps[i].price_of_best_chromosome)
                 yArrAvg.append(self.page4.steps[i].average_cost)
             self.page4.curve.setData(x=countingArr, y=yArr)
             self.page4.curveAvg.setData(x=countingArr, y=yArrAvg)
-            self.page4.changeRowColor(self.page4.steps[k-1].best_chromosome)
-            self.page4.mainText3.setText(f"Вес: {self.page4.steps[k-1].price_of_best_chromosome}, стоимость: "
-                                         f"{self.page4.steps[k-1].weight_of_best_chromosome}")
+            self.page4.changeRowColor(self.page4.steps[k - 1].best_chromosome)
+            self.page4.mainText3.setText(f"Вес: {self.page4.steps[k - 1].price_of_best_chromosome}, стоимость: "
+                                         f"{self.page4.steps[k - 1].weight_of_best_chromosome}")
             print(f"Вес: {self.page4.steps[k - 1].price_of_best_chromosome}, стоимость: "
                   f"{self.page4.steps[k - 1].weight_of_best_chromosome}, k = {k}")
         else:
@@ -225,16 +230,16 @@ class Window(QWidget):
             self.page4.stepCounter += 1
             k = self.page4.stepCounter
             self.page4.textStep.setText(f"шаг {k}")
-            countingArr = [i for i in range(k+1)]
+            countingArr = [i for i in range(k + 1)]
             yArr, yArrAvg = [0], [0]
             for i in range(k):
                 yArr.append(self.page4.steps[i].price_of_best_chromosome)
                 yArrAvg.append(self.page4.steps[i].average_cost)
             self.page4.curve.setData(x=countingArr, y=yArr)
             self.page4.curveAvg.setData(x=countingArr, y=yArrAvg)
-            self.page4.changeRowColor(self.page4.steps[k-1].best_chromosome)
-            self.page4.mainText3.setText(f"Вес: {self.page4.steps[k-1].price_of_best_chromosome}, стоимость: "
-                                         f"{self.page4.steps[k-1].weight_of_best_chromosome}")
+            self.page4.changeRowColor(self.page4.steps[k - 1].best_chromosome)
+            self.page4.mainText3.setText(f"Вес: {self.page4.steps[k - 1].price_of_best_chromosome}, стоимость: "
+                                         f"{self.page4.steps[k - 1].weight_of_best_chromosome}")
             print(f"Вес: {self.page4.steps[k - 1].price_of_best_chromosome}, стоимость: "
                   f"{self.page4.steps[k - 1].weight_of_best_chromosome}, k = {k}")
         else:
@@ -247,16 +252,16 @@ class Window(QWidget):
         self.page4.stepCounter = len(self.page4.steps)
         k = self.page4.stepCounter
         self.page4.textStep.setText(f"шаг {k}")
-        countingArr = [i for i in range(k+1)]
+        countingArr = [i for i in range(k + 1)]
         yArr, yArrAvg = [0], [0]
         for i in range(k):
             yArr.append(self.page4.steps[i].price_of_best_chromosome)
             yArrAvg.append(self.page4.steps[i].average_cost)
         self.page4.curve.setData(x=countingArr, y=yArr)
         self.page4.curveAvg.setData(x=countingArr, y=yArrAvg)
-        self.page4.changeRowColor(self.page4.steps[k-1].best_chromosome)
-        self.page4.mainText3.setText(f"Вес: {self.page4.steps[k-1].price_of_best_chromosome}, стоимость: "
-                                     f"{self.page4.steps[k-1].weight_of_best_chromosome}")
+        self.page4.changeRowColor(self.page4.steps[k - 1].best_chromosome)
+        self.page4.mainText3.setText(f"Вес: {self.page4.steps[k - 1].price_of_best_chromosome}, стоимость: "
+                                     f"{self.page4.steps[k - 1].weight_of_best_chromosome}")
 
     def RestartAlgWithNewParams(self):
         """
@@ -277,14 +282,3 @@ class Window(QWidget):
                                       self.crossoverProbability, self.countOfPopulation, modifications)
         self.checker = True
         print(self.dataForALg)
-
-
-def application():
-    app = QApplication(sys.argv)
-    window = Window()
-    window.show()
-    sys.exit(app.exec_())
-
-
-if __name__ == "__main__":
-    application()

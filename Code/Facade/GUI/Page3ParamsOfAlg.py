@@ -140,4 +140,4 @@ class Page3ParamsOfAlg:
             self.spinParam.setValue(30)
 
             self.btnNext.clicked.disconnect()
-            self.btnNext.clicked.connect(self.window.choseTypeOfVisual)
+            self.btnNext.clicked.connect(self.window.run_genetic_algorithm)

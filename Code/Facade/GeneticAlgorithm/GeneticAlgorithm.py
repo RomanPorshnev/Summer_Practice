@@ -31,13 +31,15 @@ class GeneticAlgorithm:
             case Modifications.tournament_selection.value:
                 parents_selector = TournamentSelector(population,
                                                       [self.__cost_of_individual(individual) for individual in
-                                                       population], [self.__weight_of_individual(individual) for individual in
-                                                                     population], self.__backpack_capacity)
+                                                       population],
+                                                      [self.__weight_of_individual(individual) for individual in
+                                                       population], self.__backpack_capacity)
             case Modifications.roulette_selection.value:
                 parents_selector = RouletteSelector(population,
                                                     [self.__cost_of_individual(individual) for individual in
-                                                     population], [self.__weight_of_individual(individual) for individual in
-                                                                   population], self.__backpack_capacity)
+                                                     population],
+                                                    [self.__weight_of_individual(individual) for individual in
+                                                     population], self.__backpack_capacity)
         parents = parents_selector.make_parents()
         return parents
 
@@ -115,13 +117,15 @@ class GeneticAlgorithm:
                 new_population = population_selector.make_new_population() + self.__generate_population(
                     int(self.__number_of_individuals))
         return new_population
+
     '''
     Данный метод запускает и останавливает генетический алгоритм, 
     является посредником в обмене данными между модулями ГА.
     Выходные данные: список структур, в каждой из которых хранится самая важная 
     информация о каждой популяции (понадобится для отображения в GUI)
     '''
-    def make_population_data_list(self):
+
+    def run(self):
         population = self.__generate_population(self.__number_of_individuals)
         self.__init_population_info(population)
         i = 0
@@ -132,14 +136,14 @@ class GeneticAlgorithm:
             children = self.__get_children(families)
             population = self.__get_new_population(children, population)
             self.__init_population_info(population)
-            if self.__population_data_list[-1].cost_of_best_chromosome - \
-                    self.__population_data_list[-2].cost_of_best_chromosome == 0:
+            if self.__population_data_list[-1].price_of_best_chromosome - \
+                    self.__population_data_list[-2].price_of_best_chromosome == 0:
                 i += 1
             else:
                 i = 0
             if i > 1000:
                 break
-        return self.__population_data_list[-1].cost_of_best_chromosome
+        return self.__population_data_list
 
     '''
     Данные метод инициализирует самые важные данные о каждой популяции, который нужно для отобржения графика в GUI.
@@ -149,7 +153,7 @@ class GeneticAlgorithm:
     def __init_population_info(self, population: list) -> None:
         sum_cost_of_population = 0
         max_cost_of_individual = 0
-        best_individual = population[0]
+        best_chromosome = population[0]
         bad_population = True
         for individual in population:
             cost_of_individual = self.__cost_of_individual(individual)
@@ -158,10 +162,10 @@ class GeneticAlgorithm:
                     individual) <= self.__backpack_capacity:
                 bad_population = False
                 max_cost_of_individual = cost_of_individual
-                best_individual = individual
-        population_data = PopulationData(best_individual, max_cost_of_individual,
+                best_chromosome = individual
+        population_data = PopulationData(best_chromosome, max_cost_of_individual,
                                          self.__weight_of_individual(
-                                             best_individual),
+                                             best_chromosome),
                                          sum_cost_of_population / len(population), bad_population)
         self.__population_data_list.append(population_data)
 
@@ -267,7 +271,7 @@ if __name__ == "__main__":
         input_data.modifications = [0, 2, 4, 6, 8]
 
 if __name__ == "__main__":
-    for j in range(99, 101):
+    for j in range(10, 11):
         input_data = InputData
         input_data.weights = [random.randint(1, 200) for i in range(j)]
         input_data.costs = [random.randint(1, 100) for i in range(j)]
@@ -280,5 +284,6 @@ if __name__ == "__main__":
 
         max_value, selected_items = knapsack(
             input_data.weights, input_data.costs, input_data.backpack_capacity)
-        a = genetic_algorithm.make_population_data_list()
-        print((max_value - a) / a)
+        a = genetic_algorithm.run()
+        print(a[-1].price_of_best_chromosome)
+

@@ -88,5 +88,5 @@ class DataPacking:
         number_of_items = random.randint(10, 50)
         self.input_data.backpack_capacity = random.randint(100, 500)
         for i in range(number_of_items):
-            self.input_data.weights.append(random.randint(1, 100))
+            self.input_data.weights.append(random.randint(1, 600))
             self.input_data.costs.append(random.randint(1, 100))

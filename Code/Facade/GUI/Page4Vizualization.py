@@ -16,18 +16,18 @@ class Page4Vizualization:
     """
     Отрисовка gui четвертой страницы (визуализация работы алгоритма).
     """
-    def __init__(self, window):
+    def __init__(self, window, steps):
         self.window = window
         self.data = self.window.dataForALg.input_data
 
-        step1 = PopulationData('110100001', 130, 100, 100, False)
-        step2 = PopulationData('100101001', 140, 105, 110, False)
-        step3 = PopulationData('110101101', 150, 110, 120, False)
+        # step1 = PopulationData('110100001', 130, 100, 100, False)
+        # step2 = PopulationData('100101001', 140, 105, 110, False)
+        # step3 = PopulationData('110101101', 150, 110, 120, False)
 
-        self.steps = []
-        self.steps.append(step1)
-        self.steps.append(step2)
-        self.steps.append(step3)
+        self.steps = steps
+        # self.steps.append(step1)
+        # self.steps.append(step2)
+        # self.steps.append(step3)
 
         for i in reversed(range(self.window.vbox.count())):
             self.window.vbox.itemAt(i).widget().close()
