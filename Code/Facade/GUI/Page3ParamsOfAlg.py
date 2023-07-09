@@ -117,7 +117,18 @@ class Page3ParamsOfAlg:
                 self.spinParam.setMinimum(5)
                 self.spinParam.setMaximum(100)
                 self.spinParam.setValue(5)
-            self.page3lvl = 2
+                self.page3lvl = 2
+            else:
+                self.window.mutationProbability = self.spinParam.value() / 10000
+                self.mainText2.setText("Введите размер популяции (может принимать значения от 20 до 100):")
+
+                self.spinParam.setSuffix("")
+                self.spinParam.setMinimum(20)
+                self.spinParam.setMaximum(100)
+                self.spinParam.setValue(30)
+
+                self.btnNext.clicked.disconnect()
+                self.btnNext.clicked.connect(self.window.run_genetic_algorithm)
         elif self.page3lvl == 2:
             self.window.mutationProbability = self.spinParam.value() / 10000
             self.mainText2.setText("Введите размер популяции (может принимать значения от 20 до 100):")
