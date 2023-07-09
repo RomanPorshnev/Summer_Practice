@@ -170,7 +170,6 @@ class Window(QWidget):
         Отрисовка модификации страницы3 (введение объема популяции).
         """
         self.page3.page3_mod2()
-        print("\n")
 
     def group1algResponse(self, btn):
         self.group1algRes = btn.text()
@@ -197,59 +196,9 @@ class Window(QWidget):
         genetic_algorithm = GeneticAlgorithm(self.dataForALg.input_data)
         population_data_list = genetic_algorithm.run()
         self.page4 = Page4Vizualization(self, population_data_list)
-        # if self.group3res == "пошаговая"
 
-    def PrevStepOfAlg(self):
-        """
-        Отображает предыдущий шаг алгоритма.
-        """
-        if self.page4.stepCounter > 1:
-            self.page4.stepCounter -= 1
-            k = self.page4.stepCounter
-            self.page4.textStep.setText(f"шаг {k}")
-            countingArr = [i for i in range(k + 1)]
-            yArr, yArrAvg = [0], [0]
-            for i in range(k):
-                yArr.append(self.page4.steps[i].price_of_best_chromosome)
-                yArrAvg.append(self.page4.steps[i].average_cost)
-            self.page4.curve.setData(x=countingArr, y=yArr)
-            self.page4.curveAvg.setData(x=countingArr, y=yArrAvg)
-            self.page4.changeRowColor(self.page4.steps[k - 1].best_chromosome)
-            self.page4.mainText3.setText(f"Вес: {self.page4.steps[k - 1].price_of_best_chromosome}, стоимость: "
-                                         f"{self.page4.steps[k - 1].weight_of_best_chromosome}")
-            print(f"Вес: {self.page4.steps[k - 1].price_of_best_chromosome}, стоимость: "
-                  f"{self.page4.steps[k - 1].weight_of_best_chromosome}, k = {k}")
-        else:
-            self.errorMes("Нет предыдущих шагов!")
-
-    def NextStepOfAlg(self):
-        """
-        Отображает следующий шаг алгоритма.
-        """
-        if self.page4.stepCounter < len(self.page4.steps):
-            self.page4.stepCounter += 1
-            k = self.page4.stepCounter
-            self.page4.textStep.setText(f"шаг {k}")
-            countingArr = [i for i in range(k + 1)]
-            yArr, yArrAvg = [0], [0]
-            for i in range(k):
-                yArr.append(self.page4.steps[i].price_of_best_chromosome)
-                yArrAvg.append(self.page4.steps[i].average_cost)
-            self.page4.curve.setData(x=countingArr, y=yArr)
-            self.page4.curveAvg.setData(x=countingArr, y=yArrAvg)
-            self.page4.changeRowColor(self.page4.steps[k - 1].best_chromosome)
-            self.page4.mainText3.setText(f"Вес: {self.page4.steps[k - 1].price_of_best_chromosome}, стоимость: "
-                                         f"{self.page4.steps[k - 1].weight_of_best_chromosome}")
-            print(f"Вес: {self.page4.steps[k - 1].price_of_best_chromosome}, стоимость: "
-                  f"{self.page4.steps[k - 1].weight_of_best_chromosome}, k = {k}")
-        else:
-            self.errorMes("Это последний шаг!")
-
-    def ShowLastStepOfAlf(self):
-        """
-        Отображает последний шаг алгоритма.
-        """
-        self.page4.stepCounter = len(self.page4.steps)
+    def ShowStep(self, step):
+        self.page4.stepCounter = step
         k = self.page4.stepCounter
         self.page4.textStep.setText(f"шаг {k}")
         countingArr = [i for i in range(k + 1)]
@@ -260,8 +209,31 @@ class Window(QWidget):
         self.page4.curve.setData(x=countingArr, y=yArr)
         self.page4.curveAvg.setData(x=countingArr, y=yArrAvg)
         self.page4.changeRowColor(self.page4.steps[k - 1].best_chromosome)
-        self.page4.mainText3.setText(f"Вес: {self.page4.steps[k - 1].price_of_best_chromosome}, стоимость: "
-                                     f"{self.page4.steps[k - 1].weight_of_best_chromosome}")
+        self.page4.mainText3.setText(f"Вес: {self.page4.steps[k - 1].weight_of_best_chromosome}/{self.page4.capacity}, "
+                                     f"стоимость: {self.page4.steps[k - 1].price_of_best_chromosome}")
+    def PrevStepOfAlg(self):
+        """
+        Отображает предыдущий шаг алгоритма.
+        """
+        if self.page4.stepCounter > 1:
+            self.ShowStep(self.page4.stepCounter - 1)
+        else:
+            self.errorMes("Нет предыдущих шагов!")
+
+    def NextStepOfAlg(self):
+        """
+        Отображает следующий шаг алгоритма.
+        """
+        if self.page4.stepCounter < len(self.page4.steps):
+            self.ShowStep(self.page4.stepCounter + 1)
+        else:
+            self.errorMes("Это последний шаг!")
+
+    def ShowLastStepOfAlf(self):
+        """
+        Отображает последний шаг алгоритма.
+        """
+        self.ShowStep(len(self.page4.steps))
 
     def RestartAlgWithNewParams(self):
         """
@@ -270,7 +242,7 @@ class Window(QWidget):
         for i in reversed(range(self.page4.hbox.count())):
             self.page4.hbox.itemAt(i).widget().close()
             self.page4.hbox.takeAt(i)
-        self.vbox.takeAt(6)
+        self.vbox.takeAt(7)
         self.page3 = Page3ParamsOfAlg(self)
 
     def preparingDataForAlg(self):
@@ -280,5 +252,6 @@ class Window(QWidget):
         modifications = [self.group1algRes, self.group2algRes, self.group3algRes, self.group4algRes, self.group5algRes]
         self.dataForALg = DataPacking(self.listOfWeights, self.listOfCosts, self.weightLimit, self.mutationProbability,
                                       self.crossoverProbability, self.countOfPopulation, modifications)
+        self.weightLimit = self.dataForALg.input_data.backpack_capacity
         self.checker = True
         print(self.dataForALg)

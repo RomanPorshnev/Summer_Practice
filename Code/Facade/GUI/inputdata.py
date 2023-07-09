@@ -54,7 +54,7 @@ class DataPacking:
         self.input_data.modifications.append(Modifications.in_and_outbreeding.value)
         self.input_data.modifications.append(Modifications.homogeneous_recombination.value)
         self.input_data.modifications.append(Modifications.adaptive_mutator.value)
-        self.input_data.modifications.append(Modifications.selection_by_displacement.value)
+        self.input_data.modifications.append(Modifications.elite_selection.value)
 
         if "рулеточный" in modifications:
             self.input_data.modifications[0] = Modifications.roulette_selection.value
@@ -64,8 +64,8 @@ class DataPacking:
             self.input_data.modifications[2] = Modifications.single_point_recombination.value
         if "двоичный" in modifications:
             self.input_data.modifications[3] = Modifications.binary_mutator.value
-        if "элитарный" in modifications:
-            self.input_data.modifications[4] = Modifications.elite_selection.value
+        if "вытеснение" in modifications:
+            self.input_data.modifications[4] = Modifications.selection_by_displacement.value
 
         if not weights:
             self.data_generator()

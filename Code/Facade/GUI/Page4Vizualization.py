@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QLabel, QPushButton, QTableWidget, QTableWidgetItem, QHBoxLayout
+from PyQt5.QtWidgets import QLabel, QPushButton, QTableWidget, QTableWidgetItem, QHBoxLayout, QSlider
 from PyQt5.QtGui import QColor
+from PyQt5.QtCore import Qt
 from pyqtgraph import PlotWidget
 from dataclasses import dataclass
 
@@ -19,15 +20,8 @@ class Page4Vizualization:
     def __init__(self, window, steps):
         self.window = window
         self.data = self.window.dataForALg.input_data
-
-        # step1 = PopulationData('110100001', 130, 100, 100, False)
-        # step2 = PopulationData('100101001', 140, 105, 110, False)
-        # step3 = PopulationData('110101101', 150, 110, 120, False)
-
         self.steps = steps
-        # self.steps.append(step1)
-        # self.steps.append(step2)
-        # self.steps.append(step3)
+        self.capacity = self.data.backpack_capacity
 
         for i in reversed(range(self.window.vbox.count())):
             self.window.vbox.itemAt(i).widget().close()
@@ -44,7 +38,7 @@ class Page4Vizualization:
         self.stepCounter = 1
         self.curve = self.graphic.plot(x = [0, self.stepCounter], y = [0, self.steps[0].price_of_best_chromosome],
                                        pen = {'color':'black', 'width':5}, name = "best cost")
-        self.curveAvg = self.graphic.plot(x = [0, 1, 2, 3, 4], y = [10, 20, 5, 6, 10],
+        self.curveAvg = self.graphic.plot(x = [0, self.stepCounter], y = [0, self.steps[0].average_cost],
                                        pen = {'color':'red', 'width':5}, name = "average cost")
         self.graphic.setBackground('w')
 
@@ -64,8 +58,14 @@ class Page4Vizualization:
 
         self.changeRowColor(self.steps[0].best_chromosome)
 
-        self.mainText3 = QLabel(f"Вес: {10}, стоимость: {200}", window)
+        self.mainText3 = QLabel(f"Вес: {self.steps[0].weight_of_best_chromosome}/{self.capacity}, стоимость: "
+                                f"{self.steps[0].price_of_best_chromosome}", window)
         self.mainText3.setStyleSheet("font: oblique 14pt \"Umpush\";")
+
+        self.stepSlider = QSlider(Qt.Horizontal, window)
+        self.stepSlider.setMinimum(1)
+        self.stepSlider.setMaximum(len(self.steps))
+        self.stepSlider.valueChanged[int].connect(self.window.ShowStep)
 
         self.hbox = QHBoxLayout()
 
@@ -96,6 +96,7 @@ class Page4Vizualization:
         self.window.vbox.addWidget(self.mainText2)
         self.window.vbox.addWidget(self.itemsTable)
         self.window.vbox.addWidget(self.mainText3)
+        self.window.vbox.addWidget(self.stepSlider)
         self.window.vbox.addLayout(self.hbox)
 
     def changeRowColor(self, chromosome: str):

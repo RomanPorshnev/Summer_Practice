@@ -12,18 +12,6 @@ class Page3ParamsOfAlg:
             self.window.vbox.itemAt(i).widget().close()
             self.window.vbox.takeAt(i)
 
-        # layout = self.window.vbox
-        # if layout is not None:
-        #     while layout.count():
-        #         item = layout.takeAt(0)
-        #         if item is not None:
-        #             while item.count():
-        #                 subitem = item.takeAt(0)
-        #                 widget = subitem.widget()
-        #                 if widget is not None:
-        #                     widget.setParent(None)
-        #             layout.removeItem(item)
-
         self.group1, self.group2, self.group3 = QButtonGroup(self.window), QButtonGroup(self.window), QButtonGroup(self.window)
         self.group4, self.group5 = QButtonGroup(self.window), QButtonGroup(self.window)
 
