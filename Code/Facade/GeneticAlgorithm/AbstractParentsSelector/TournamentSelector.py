@@ -27,10 +27,3 @@ class TournamentSelector(AbstractParentsSelector):
             self._selected_parents.append(
                 self._population[individuals[0][2]])
         return self._selected_parents
-
-
-if __name__ == '__main__':
-    arr = ['10011', '11001', '11100', '00110', '00100'] 
-    costs = [10, 100, 32, 51, 16]
-    x = TournamentSelector(arr, costs)
-    print(x.make_parents())

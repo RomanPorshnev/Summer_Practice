@@ -41,12 +41,3 @@ class HomogeneousRecombinator(AbstractRecombinator):
 
         return self._selected_children  # Возвращаем список выбранных потомков
 
-
-if __name__ == "__main__":
-    for i in range(100):
-        arr = []
-        for i in range(100):
-            arr.append(
-                (list(bin(randint(16, 31))[2:]), list(bin(randint(16, 32))[2:])))
-            x = HomogeneousRecombinator(arr, 0.6, 0.8)
-            x.make_children()

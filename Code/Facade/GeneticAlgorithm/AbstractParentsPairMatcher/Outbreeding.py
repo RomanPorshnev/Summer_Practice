@@ -22,9 +22,3 @@ class Outbreeding(AbstractParentsMatcher):
             self._parents_pairs.append((first_parent, self._parents[index_of_second_parent]))
             self._parents.pop(index_of_first_parent)
         return self._parents_pairs
-
-
-if __name__ == "__main__":
-    arr = [['0', '0', '0'], ['1', '1', '1'], ['0', '0', '1']]
-    out_breeding = Outbreeding(arr)
-    print(out_breeding.make_parents_pairs())

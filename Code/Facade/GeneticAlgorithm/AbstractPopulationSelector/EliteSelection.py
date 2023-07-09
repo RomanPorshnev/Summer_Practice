@@ -39,7 +39,3 @@ class EliteSelection(AbstractPopulationSelector):
         for i in range(size_of_shortage):
             fined_individuals += [self._info_about_fined_individuals[i][2]]
         return fined_individuals
-
-
-if __name__ == "__main__":
-    pass

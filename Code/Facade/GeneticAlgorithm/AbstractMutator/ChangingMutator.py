@@ -35,13 +35,3 @@ class ChangingMutator(AbstractMutator):
             self._selected_population.append(child2)
 
         return self._selected_population  # Возвращаем список выбранной популяции
-
-
-if __name__ == "__main__":
-    for i in range(100):
-        arr = []
-        for i in range(100):
-            arr.append(
-                (list(bin(randint(16, 31))[2:]), list(bin(randint(16, 32))[2:]), list(bin(randint(16, 31))[2:]), list(bin(randint(16, 31))[2:])))
-            x = ChangingMutator(arr, 0.6)
-            x.make_mutation()

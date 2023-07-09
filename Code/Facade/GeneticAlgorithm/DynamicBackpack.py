@@ -30,4 +30,4 @@ def knapsack(weights, values, capacity):
             j -= weights[i - 1]
         i -= 1
 
-    return dp[n][capacity], selected_items[::-1]
+    return dp[n][capacity]

@@ -27,13 +27,3 @@ class SinglePointRecombinator(AbstractRecombinator):
                 self._selected_children.append((individual1, individual2, self._parents_pairs[i][0], self._parents_pairs[i][1]))
 
         return self._selected_children  # Возвращаем список выбранных потомков
-
-if __name__ == "__main__":
-    for i in range(1):
-        arr = []
-        for i in range(5):
-            # Генерируем случайные пары родителей, представленных в виде бинарных строк
-            arr.append(
-                (list(bin(randint(16, 31))[2:]), list(bin(randint(16, 32))[2:])))
-        x = SinglePointRecombinator(arr, 0.6, 0.8)  # Создаем объект класса SinglePointRecombinator
-        print(x.make_children())  # Выводим список созданных потомков

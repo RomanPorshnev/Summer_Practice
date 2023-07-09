@@ -1,2 +1,5 @@
+from Facade import *
 if __name__ == "__main__":
-    pass
+    facade = Facade()
+    facade.run()
+

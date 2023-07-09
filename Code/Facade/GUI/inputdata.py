@@ -75,18 +75,19 @@ class DataPacking:
             self.input_data.backpack_capacity = backpack_capacity
 
     def __str__(self):
-        return f"веса предметов: {self.input_data.weights}\nстоимости предметов: {self.input_data.costs}\n" \
-               f"вместительность рюкзака: {self.input_data.backpack_capacity}\n" \
-               f"вер-ть мутации: {self.input_data.probability_of_mutation}\nвер-ть кроссинговера: " \
-               f"{self.input_data.probability_of_crossover}\nобъем популяции: {self.input_data.number_of_individuals}\n" \
-               f"модификации: {self.input_data.modifications}"
+        return f"Веса предметов: {self.input_data.weights}\nСтоимости предметов: {self.input_data.costs}\n" \
+               f"Вместительность рюкзака: {self.input_data.backpack_capacity}\n" \
+               f"Вероятность мутации: {self.input_data.probability_of_mutation}\nВероятность кроссинговера: " \
+               f"{self.input_data.probability_of_crossover}\nОбъем популяции: {self.input_data.number_of_individuals}\n" \
+               f"Модификации: {self.input_data.modifications}"
 
     def data_generator(self):
         """
         Случайно генерирует вместительность рюкзака и предметы.
         """
-        number_of_items = random.randint(10, 50)
+        number_of_items = 100
+        # number_of_items = random.randint(10, 100)
         self.input_data.backpack_capacity = random.randint(100, 500)
         for i in range(number_of_items):
-            self.input_data.weights.append(random.randint(1, 600))
+            self.input_data.weights.append(random.randint(1, 700))
             self.input_data.costs.append(random.randint(1, 100))

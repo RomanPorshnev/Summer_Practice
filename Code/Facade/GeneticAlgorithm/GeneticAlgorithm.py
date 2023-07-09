@@ -16,7 +16,7 @@ class GeneticAlgorithm:
         self.__number_of_individuals = input_data.number_of_individuals
         self.__backpack_capacity = input_data.backpack_capacity
         self.__parents_selector, self.__pair_matcher, self.__recombinator, \
-            self.__mutator, self.__population_selector = input_data.modifications
+        self.__mutator, self.__population_selector = input_data.modifications
         self.__population_data_list = []
 
     '''
@@ -128,10 +128,12 @@ class GeneticAlgorithm:
     def run(self):
         population = self.__generate_population(self.__number_of_individuals)
         self.__init_population_info(population)
+        print(
+            f"Стоимость ранца (динамический метод): {knapsack(self.__weights, self.__costs, self.__backpack_capacity)}")
         i = 0
-        while i < 1000:
+        while i < 100:
             parents = self.__get_parents(population)
-            parents_pairs = self.__get_parents_pairs(parents, i > 500)
+            parents_pairs = self.__get_parents_pairs(parents, i > 50)
             families = self.__get_families(parents_pairs)
             children = self.__get_children(families)
             population = self.__get_new_population(children, population)
@@ -141,8 +143,6 @@ class GeneticAlgorithm:
                 i += 1
             else:
                 i = 0
-            if i > 1000:
-                break
         return self.__population_data_list
 
     '''
@@ -257,33 +257,3 @@ class GeneticAlgorithm:
                 self.__cost_of_individual(individual), self.__weight_of_individual(individual), individual)
             info_about_individuals.append(info_about_individual)
         return info_about_individuals
-
-
-if __name__ == "__main__":
-    for j in range(10):
-        input_data = InputData
-        input_data.weights = [random.randint(0, 200) for i in range(50)]
-        input_data.costs = [random.randint(0, 100) for i in range(50)]
-        input_data.probability_of_mutation = 0.01
-        input_data.probability_of_crossover = 0.8
-        input_data.number_of_individuals = 30
-        input_data.backpack_capacity = 100
-        input_data.modifications = [0, 2, 4, 6, 8]
-
-if __name__ == "__main__":
-    for j in range(10, 11):
-        input_data = InputData
-        input_data.weights = [random.randint(1, 200) for i in range(j)]
-        input_data.costs = [random.randint(1, 100) for i in range(j)]
-        input_data.probability_of_mutation = 0.01
-        input_data.probability_of_crossover = 0.8
-        input_data.number_of_individuals = 40
-        input_data.backpack_capacity = 20
-        input_data.modifications = [0, 3, 5, 7, 8]
-        genetic_algorithm = GeneticAlgorithm(input_data)
-
-        max_value, selected_items = knapsack(
-            input_data.weights, input_data.costs, input_data.backpack_capacity)
-        a = genetic_algorithm.run()
-        print(a[-1].price_of_best_chromosome)
-

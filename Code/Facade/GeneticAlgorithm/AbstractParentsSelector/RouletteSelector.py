@@ -29,11 +29,3 @@ class RouletteSelector(AbstractParentsSelector):
             self._selected_parents.append(to_add)
 
         return self._selected_parents
-
-
-if __name__ == '__main__':
-    arr = ['10011', '11001', '11100', '00110', '00100']
-    costs = [10, 100, 32, 51, 16]
-    weights = [50, 10, 20, 31, 3]
-    x = RouletteSelector(arr, costs, weights, 20)
-    print(x.make_parents())
